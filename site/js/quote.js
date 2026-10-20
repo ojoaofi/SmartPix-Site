@@ -25,7 +25,7 @@
   function left(n) { return n === 0 ? 'é hoje' : n === 1 ? 'falta 1 dia' : 'faltam ' + n + ' dias'; }
   function dateBR(s) { var p = s.split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : s; }
   function rows(d) {
-    var r = [['Perfil', d.perfil || 'Escolha ao lado'], ['Produtos', d.produtos.join(', ') || 'Escolha ao lado']];
+    var r = [['Perfil', d.perfil || 'A escolher'], ['Produtos', d.produtos.join(', ') || 'A escolher']];
     if (d.sized) r.push(['Medida', fmt(d.w) + ' × ' + fmt(d.h) + ' m · ' + d.q + ' un.']);
     if (d.date) r.push(['Evento', dateBR(d.date) + (d.days != null && d.days >= 0 ? ' · ' + left(d.days) : '')]);
     if (d.local) r.push(['Local', d.local]);
@@ -72,7 +72,7 @@
   function restore() { try { var o = JSON.parse(sessionStorage.getItem(KEY) || 'null'); if (!o) return; $$('input,textarea,select').forEach(function (i) { if (!(i.name in o)) return; if (i.type === 'radio') i.checked = o[i.name] === i.value; else if (i.type === 'checkbox') i.checked = [].concat(o[i.name]).indexOf(i.value) > -1; else i.value = o[i.name]; }); if (o._s2) show2(false); } catch (e) {} }
 
   function show2(focus) {
-    step2.hidden = false; D.getElementById('st2').classList.add('on'); D.getElementById('goStep2').hidden = true;
+    step2.hidden = false; D.getElementById('st2').classList.add('on'); D.getElementById('stTxt').textContent = 'Etapa 2 de 2 · Detalhes'; D.getElementById('goStep2').hidden = true;
     if (focus) { setTimeout(function () { step2.scrollIntoView({ behavior: SP.reduce ? 'auto' : 'smooth', block: 'start' }); step2.focus({ preventScroll: true }); }, 30); }
     SP.track('quote_step', { step: 2 });
   }
@@ -108,10 +108,12 @@
     SP.say && SP.say((k === 'w' ? 'Largura: ' : k === 'h' ? 'Altura: ' : 'Quantidade: ') + (k === 'q' ? el.value + ' unidades' : fmt(+el.value) + ' m'));
   });
   D.getElementById('goStep2').addEventListener('click', function () { if (check(1)) show2(true); });
-  function send(method) { return function (e) { if (!check('s')) { e.preventDefault(); return; } update(); var d = data(); SP.track('generate_lead', { method: method, perfil: d.perfil, produtos: d.produtos.join('|'), area_m2: d.sized ? +(d.w * d.h * d.q).toFixed(2) : 0, days_to_event: d.days, installation: d.inst || 'n/a', lead_source: d.origem || 'n/a' }); }; }
+  function send(method) { return function (e) { if (!check('s')) { e.preventDefault(); return; } update(); var d = data(); if (method === 'whatsapp') { var st = D.getElementById('sent'); st.hidden = false; } SP.track('generate_lead', { method: method, perfil: d.perfil, produtos: d.produtos.join('|'), area_m2: d.sized ? +(d.w * d.h * d.q).toFixed(2) : 0, days_to_event: d.days, installation: d.inst || 'n/a', lead_source: d.origem || 'n/a' }); }; }
   waBtn.addEventListener('click', send('whatsapp'));
   mailBtn.addEventListener('click', send('email'));
   if (dockBtn) dockBtn.addEventListener('click', send('whatsapp'));
+  var cm = D.getElementById('copyMsg');
+  if (cm) cm.addEventListener('click', function () { var t = message(data()); try { navigator.clipboard.writeText(t).then(function () { cm.textContent = 'Mensagem copiada'; SP.say('Mensagem copiada'); setTimeout(function () { cm.textContent = 'Copiar mensagem'; }, 1800); }); } catch (e) {} SP.track('copy', { what: 'quote_message' }); });
   var dateEl = form.elements.data; if (dateEl) { var t = new Date(); dateEl.min = t.toISOString().slice(0, 10); }
   update();
 })();

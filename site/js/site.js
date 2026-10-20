@@ -52,8 +52,27 @@
 
   /* ---------- Nav: scroll-edge effect only once content passes under it ---------- */
   var nav = D.querySelector('.nav');
-  function edge() { if (nav) nav.style.setProperty('--edge', scrollY > 8 ? 1 : 0); }
-  addEventListener('scroll', edge, { passive: true }); edge();
+  /* The bar adapts to what scrolls under it: light material over light sections, dark over dark (as on apple.com). */
+  function bgLum(el) {
+    for (; el && el !== D.documentElement; el = el.parentElement) {
+      var c = getComputedStyle(el).backgroundColor, m = c.match(/[\d.]+/g);
+      if (m && (m.length < 4 || +m[3] > 0.5)) return (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255;
+    }
+    var b = getComputedStyle(D.body).backgroundColor.match(/[\d.]+/g); return b ? (0.2126 * b[0] + 0.7152 * b[1] + 0.0722 * b[2]) / 255 : 1;
+  }
+  var lastLight = null, edgeRaf = 0, bands = [].slice.call(D.querySelectorAll('main > *, main section, .tiles, .tile, .foot'));
+  function edge() {
+    edgeRaf = 0; if (!nav) return;
+    nav.style.setProperty('--edge', scrollY > 8 ? 1 : 0);
+    /* the block currently under the bar: the deepest band whose box spans the bar's lower edge */
+    var y = nav.getBoundingClientRect().bottom - 4, el = null;
+    for (var i = 0; i < bands.length; i++) { var r = bands[i].getBoundingClientRect(); if (r.top <= y && r.bottom > y) el = bands[i]; }
+    if (!el) { for (var j = 0; j < bands.length; j++) if (bands[j].getBoundingClientRect().top > y) { el = bands[j]; break; } }
+    var light = el ? bgLum(el) > 0.6 : false;
+    if (light !== lastLight) { lastLight = light; nav.classList.toggle('light', light); }
+  }
+  addEventListener('scroll', function () { if (!edgeRaf) edgeRaf = requestAnimationFrame(edge); }, { passive: true });
+  addEventListener('resize', edge); edge();
 
   /* ---------- Menu sheet: scales out of its trigger, closes back into it ---------- */
   var btn = D.getElementById('menuBtn'), sheet = D.getElementById('sheet'), scrim = D.getElementById('scrim');
@@ -109,12 +128,57 @@
     if (!reduce) { addEventListener('scroll', function () { requestAnimationFrame(mfScroll); }, { passive: true }); mfScroll(); }
   }
 
-  /* ---------- Rails ---------- */
+  /* ---------- Rails: touch uses native scrolling; mouse gets 1:1 drag, momentum projected to the nearest card, spring settle ---------- */
   D.querySelectorAll('[data-rail]').forEach(function (wrap) {
     var rail = wrap.querySelector('.rail'); if (!rail) return;
+    var cards = [].slice.call(rail.querySelectorAll('.card')), sp = new Spring({ damping: 1, response: 0.45 }), anim = null, band = new Spring({ damping: 1, response: 0.4 }), bandAnim = null;
+    function stops() { var pad = parseFloat(getComputedStyle(rail).scrollPaddingLeft) || 0, max = rail.scrollWidth - rail.clientWidth; return cards.map(function (c) { return Math.max(0, Math.min(max, c.offsetLeft - pad)); }).concat([max]); }
+    function nearest(x) { return stops().reduce(function (b, s) { return Math.abs(s - x) < Math.abs(b - x) ? s : b; }, 0); }
+    function snapOff() { rail.style.scrollSnapType = 'none'; }
+    function snapOn() { rail.style.scrollSnapType = ''; }
+    function glide(target, v) {
+      if (anim) anim.stop(); snapOff(); sp.x = rail.scrollLeft; sp.v = v || 0; sp.to = target;
+      if (reduce) { rail.scrollLeft = target; snapOn(); return; }
+      anim = run(sp, function (x) { rail.scrollLeft = x; }, snapOn, 0.5);
+    }
+    function setBand(px) { rail.style.transform = px ? 'translateX(' + px.toFixed(1) + 'px)' : ''; }
     wrap.querySelectorAll('[data-dir]').forEach(function (b) {
-      b.addEventListener('click', function () { var c = rail.querySelector('.card'); var w = c ? c.getBoundingClientRect().width + 20 : 320; rail.scrollBy({ left: +b.getAttribute('data-dir') * w, behavior: reduce ? 'auto' : 'smooth' }); track('rail_nav'); });
+      b.addEventListener('click', function () {
+        var d = +b.getAttribute('data-dir'), cur = anim && anim.alive ? sp.to : rail.scrollLeft, st = stops(), i = 0;
+        st.forEach(function (s, j) { if (Math.abs(s - cur) < Math.abs(st[i] - cur)) i = j; });
+        glide(st[Math.max(0, Math.min(st.length - 1, i + d))]); track('rail_nav');
+      });
     });
+    var down = false, dragging = false, sx = 0, start = 0, tr = null, moved = false;
+    rail.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      down = true; dragging = false; moved = false; sx = e.clientX; if (anim) anim.stop(); start = rail.scrollLeft; tr = new Tracker(); tr.add(-start, e.timeStamp);
+    });
+    rail.addEventListener('pointermove', function (e) {
+      if (!down) return; var dx = e.clientX - sx;
+      if (!dragging) { if (Math.abs(dx) < 10) return; dragging = true; moved = true; snapOff(); rail.classList.add('grabbing'); try { rail.setPointerCapture(e.pointerId); } catch (_) {} }
+      var want = start - dx, max = rail.scrollWidth - rail.clientWidth, over = want < 0 ? want : want > max ? want - max : 0;
+      rail.scrollLeft = Math.max(0, Math.min(max, want)); setBand(over ? -rubberband(over, rail.clientWidth) : 0);
+      tr.add(-want, e.timeStamp);
+    });
+    function up() {
+      if (!down) return; down = false; if (!dragging) return; dragging = false; rail.classList.remove('grabbing');
+      var v = -tr.v(), target = nearest(rail.scrollLeft + project(v, 0.995));
+      var off = parseFloat((rail.style.transform.match(/-?[\d.]+/) || [0])[0]);
+      if (off) { band.x = off; band.to = 0; band.v = 0; if (bandAnim) bandAnim.stop(); bandAnim = run(band, function (x) { setBand(x); }, function () { setBand(0); }); }
+      glide(target, v);
+    }
+    rail.addEventListener('pointerup', up); rail.addEventListener('pointercancel', up);
+    rail.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+    rail.addEventListener('dragstart', function (e) { e.preventDefault(); });
+    rail.addEventListener('wheel', function () { if (anim) { anim.stop(); snapOn(); } }, { passive: true });
+  });
+
+  /* ---------- Horizontal sub-navigation: fade only the edge that has more content ---------- */
+  D.querySelectorAll('.subnav ul').forEach(function (u) {
+    var w = u.parentNode;
+    function f() { w.classList.toggle('fade-l', u.scrollLeft > 4); w.classList.toggle('fade-r', u.scrollLeft < u.scrollWidth - u.clientWidth - 4); }
+    u.addEventListener('scroll', f, { passive: true }); addEventListener('resize', f); f();
   });
 
   /* ---------- FAQ, copy ---------- */

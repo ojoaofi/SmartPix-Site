@@ -50,7 +50,7 @@ def head(title, desc, path, ld=None, page='index'):
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="img/logo-180.png">
 <link rel="apple-touch-icon" sizes="180x180" href="img/logo-180.png">
-<link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/site.css">
 {ldj}
 </head>
@@ -59,7 +59,7 @@ def head(title, desc, path, ld=None, page='index'):
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 '''
 
-NAV_ITEMS = [('solucoes.html', 'Soluções'), ('cenografia.html', 'Para cenografia'), ('projetos.html', 'Projetos'), ('./#problemas', 'Problemas que resolvemos'), ('./#duvidas', 'Dúvidas')]
+NAV_ITEMS = [('solucoes.html', 'Soluções'), ('cenografia.html', 'Para cenografia'), ('projetos.html', 'Projetos'), ('./#problemas', 'Problemas'), ('./#duvidas', 'Dúvidas')]
 def nav(active):
     links = ''.join(f'<li><a href="{h}"' + (' aria-current="page"' if h == active else '') + f'>{t}</a></li>' for h, t in NAV_ITEMS)
     sheet = ''.join(f'<a href="{h}">{t}<span aria-hidden="true">›</span></a>' for h, t in [('./', 'Início')] + NAV_ITEMS)
@@ -114,7 +114,10 @@ def foot(scripts=(), dock=('orcamento.html', 'Pedir orçamento')):
 </html>
 '''
 
-def kicker(t): return f'<p class="kicker">{t}</p>'
+FIX = [('smart floor', 'Smart Floor'), ('pdv', 'PDV'), ('3d', '3D'), ('smart pix', 'Smart Pix'), ('atibaia', 'Atibaia')]
+def kicker(t):
+    for a, b in FIX: t = t.replace(a, b)
+    return f'<p class="kicker">{t[0].upper() + t[1:]}</p>'
 
 # ------------------------------------------------------------------ data
 PRODUCTS = [
@@ -224,27 +227,26 @@ def page_home():
     hero = f'''
 <section class="hero stage center" id="estudio" aria-labelledby="h-hero">
   <div class="wrap">
-    <p class="kicker">impressão digital e cenografia<span class="k-x"> · Atibaia, SP</span></p>
+    <p class="kicker">Impressão digital e cenografia · Atibaia, SP</p>
     <h1 id="h-hero" class="h-hero">Sua marca em <span class="lime">tamanho real.</span></h1>
-    <p class="lead">Gráfica de grande formato para eventos, cenografia e varejo. Imprimimos até 5 m sem emenda, produzimos e instalamos.</p>
+    <p class="lead">Grande formato para eventos, cenografia e varejo. Até 5 m sem emenda, com produção e instalação próprias.</p>
   </div>
   <div class="studio" id="studio">
-    <div class="wrap">
-      <div class="studio-panel ui" role="group" aria-label="Monte seu estande">
-        <div class="studio-field"><label for="brandName">Digite sua marca e veja o estande</label><input id="brandName" type="text" maxlength="22" autocomplete="organization" placeholder="Nome da sua marca" enterkeyhint="done"></div>
-        <div class="studio-field"><label id="lblColor">Cor da marca</label><div class="swatches" role="radiogroup" aria-labelledby="lblColor">{swatches}</div></div>
-        <a class="btn btn-fill" id="studioQuote" href="orcamento.html?produto=Estande%20completo" data-cta="studio">Orçar este estande{ARROW}</a>
-      </div>
-      <p class="studio-more"><a class="link" href="solucoes.html" data-cta="hero-sol">Não é estande? Ver todas as soluções ›</a><a class="link" href="https://wa.me/{WA_NUM}" data-wa="Olá, Smart Pix! Vim pelo site e quero falar sobre um projeto." data-cta="hero-wa">Prefere conversar? WhatsApp ›</a></p>
-    </div>
     <div class="studio-stage" role="group" aria-label="Visualizador 3D do estande">
       <div class="studio-3d" role="img" aria-label="Estande com a sua marca: lona de 5 por 3 metros, piso Smart Floor, balcão, totem e letra-caixa.">{pic('ai-booth', '', lazy=False, cls='fallback')}<canvas id="studioCanvas" aria-hidden="true"></canvas></div>
       <div class="studio-labels" aria-hidden="true"><span data-part="lona">Lona 5 × 3 m sem emenda</span><span data-part="piso">Smart Floor</span><span data-part="balcao">Balcão</span><span data-part="totem">Totem</span><span data-part="letra">Letra-caixa</span></div>
-      <div class="studio-views ui" role="group" aria-label="Vista do estande"><button type="button" data-view="50" aria-pressed="false">Lateral</button><button type="button" data-view="25" aria-pressed="true">3/4</button><button type="button" data-view="0" aria-pressed="false">Frente</button><span class="studio-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 12h8M5 9l-3 3 3 3M19 9l3 3-3 3"/></svg>ou arraste</span></div>
+      <div class="studio-views ui" role="group" aria-label="Vista do estande"><button type="button" data-view="50" aria-pressed="false">Lateral</button><button type="button" data-view="25" aria-pressed="true">3/4</button><button type="button" data-view="0" aria-pressed="false">Frente</button></div>
     </div>
-    <p class="studio-out wrap" id="studioOut"></p><p class="sr" id="studioLive" aria-live="polite"></p>
+    <div class="wrap">
+      <div class="studio-panel ui" role="group" aria-label="Monte seu estande">
+        <div class="studio-field"><label for="brandName">Sua marca</label><input id="brandName" type="text" maxlength="22" autocomplete="organization" placeholder="Digite e veja no estande" enterkeyhint="done"></div>
+        <div class="studio-field"><label id="lblColor">Cor</label><div class="swatches" role="radiogroup" aria-labelledby="lblColor">{swatches}</div></div>
+        <a class="btn btn-fill" id="studioQuote" href="orcamento.html?produto=Estande%20completo" data-cta="studio">Orçar este estande</a>
+      </div>
+      <p class="studio-out" id="studioOut"></p><p class="sr" id="studioLive" aria-live="polite"></p>
+      <p class="studio-more"><a class="link" href="solucoes.html" data-cta="hero-sol">Ver todas as soluções <span aria-hidden="true">›</span></a><a class="link" href="https://wa.me/{WA_NUM}" data-wa="Olá, Smart Pix! Vim pelo site e quero falar sobre um projeto." data-cta="hero-wa">Falar no WhatsApp <span aria-hidden="true">›</span></a></p>
+    </div>
   </div>
-  <div style="height:var(--s8)"></div>
 </section>
 <section class="proof" aria-label="Por que a Smart Pix">
   <div class="wrap"><ul>
@@ -383,7 +385,7 @@ def page_cenografia():
   <div class="wide-img">{pic('ai-install', 'Ilustração gerada por IA: equipe instalando um painel de 5 metros num estande, com uma van ao lado', sizes='(max-width:1100px) 100vw, 67rem')}<span class="tag">{AI}</span></div></div></section>
 <section class="sec" id="agencias" aria-labelledby="h-ag"><div class="wrap"><div class="prod" style="border:0;padding-block:0"><div class="prod-img">{pic('ai-whitelabel', 'Ilustração gerada por IA: rolos de lona embalados em papel kraft, sem identificação, ao lado de uma van branca', sizes='(max-width:860px) 100vw, 34rem')}<span class="tag">{AI}</span></div><div>{kicker('agências · produtoras')}<h2 id="h-ag" class="h2">Você atende o cliente. A gente produz.</h2><p class="lead">Atuamos como parceiro de produção para agências e produtoras que precisam entregar sem montar uma gráfica.</p><ul><li>Um responsável do pedido à entrega</li><li>Identificação da entrega conversada no orçamento</li><li>Prazo de produção alinhado à data do evento</li></ul><div class="ctas"><a class="btn btn-fill" href="orcamento.html?perfil=Ag%C3%AAncia%20%2F%20produtora" data-cta="ag">Orçar como agência</a></div></div></div></div></section>
 <section class="sec alt" aria-labelledby="h-how"><div class="wrap"><div class="sec-head">{kicker('como funciona a parceria')}<h2 id="h-how" class="h2">Quatro passos, um responsável.</h2></div>
-  <ol class="steps" style="--stage-line:var(--line)"><li><span class="n num" style="color:var(--lime-ink)">01</span><b>Você envia o projeto</b><span class="small" style="color:var(--ink-muted)">Medidas, materiais, local e a janela de montagem.</span></li><li><span class="n num" style="color:var(--lime-ink)">02</span><b>Orçamento</b><span class="small" style="color:var(--ink-muted)">Com o prazo de produção alinhado à data do evento.</span></li><li><span class="n num" style="color:var(--lime-ink)">03</span><b>Produção</b><span class="small" style="color:var(--ink-muted)">Impressão UV LED e acabamento na nossa produção.</span></li><li><span class="n num" style="color:var(--lime-ink)">04</span><b>Entrega ou montagem</b><span class="small" style="color:var(--ink-muted)">No pavilhão, pela nossa frota e, se quiser, pela nossa equipe.</span></li></ol></div></section>
+  <ol class="steps" style="--stage-line:var(--line)"><li><span class="n num">01</span><b>Você envia o projeto</b><span class="small" style="color:var(--ink-muted)">Medidas, materiais, local e a janela de montagem.</span></li><li><span class="n num">02</span><b>Orçamento</b><span class="small" style="color:var(--ink-muted)">Com o prazo de produção alinhado à data do evento.</span></li><li><span class="n num">03</span><b>Produção</b><span class="small" style="color:var(--ink-muted)">Impressão UV LED e acabamento na nossa produção.</span></li><li><span class="n num">04</span><b>Entrega ou montagem</b><span class="small" style="color:var(--ink-muted)">No pavilhão, pela nossa frota e, se quiser, pela nossa equipe.</span></li></ol></div></section>
 <section class="sec" aria-labelledby="h-brief"><div class="wrap"><div class="prod brief" style="border:0;padding-block:0"><div>{kicker('para orçar mais rápido')}<h2 id="h-brief" class="h2">O que mandar no primeiro contato.</h2><p class="lead">Com isso em mãos, o orçamento sai sem idas e voltas.</p></div><div>
   <ul><li>Medidas finais de cada peça</li><li>Material desejado, ou o uso da peça (dentro ou fora, com luz ou sem)</li><li>Data, horário e local da montagem</li><li>Quantidade</li><li>Arte em alta resolução, se já tiver</li><li>Se precisa de instalação</li></ul>
   <div class="ctas"><a class="btn btn-fill" href="orcamento.html?perfil=Cenografia%20%2F%20montadora" data-cta="ceno-brief">Montar o pedido</a></div></div></div></div></section>'''
@@ -407,7 +409,7 @@ def page_projetos():
   <div class="pgrid" id="pgrid">{cards}</div>
   <figure class="photo" style="margin-top:var(--s7);aspect-ratio:21/9"><img src="img/real-fabrica-1440.webp" srcset="img/real-fabrica-800.webp 800w, img/real-fabrica-1440.webp 1440w" sizes="100vw" alt="Galpão de produção da Smart Pix em Atibaia" width="1440" height="1440" loading="lazy" decoding="async" style="object-position:50% 60%"><figcaption>Foto real · onde tudo é produzido</figcaption></figure>
 </div></section>
-<dialog class="pd" id="pd" aria-labelledby="pd-title"><button type="button" class="pd-close" data-close aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="pd-content"></div></dialog>'''
+<dialog class="pd" id="pd" aria-labelledby="pd-title"><span class="pd-grab" aria-hidden="true"></span><button type="button" class="pd-close" data-close aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="pd-content"></div></dialog>'''
     return h + body + foot(('projects.js',))
 
 def page_orcamento():
@@ -424,7 +426,7 @@ def page_orcamento():
 <section class="sec" style="padding-top:0" aria-label="Formulário de orçamento"><div class="wrap">
   <form class="q" id="qform" novalidate>
     <div class="q-panel">
-      <div class="q-steps" aria-hidden="true"><span class="on" id="st1"><i>1</i>O essencial</span><span id="st2"><i>2</i>Detalhes</span></div>
+      <div class="q-prog" aria-hidden="true"><p id="stTxt">Etapa 1 de 2 · O essencial</p><div class="q-bar"><i id="st2"></i></div></div>
       <fieldset aria-describedby="err1"><legend>Você é <small>obrigatório</small></legend><div class="opts">{perf}</div></fieldset>
       <fieldset aria-describedby="err1"><legend>O que você precisa? <small>obrigatório · pode marcar mais de um</small></legend><div class="opts">{po}</div></fieldset>
       <fieldset><legend>Seus dados</legend><div class="grid2"><div class="f"><label for="q-nome">Nome <span>(obrigatório)</span></label><input id="q-nome" name="nome" type="text" autocomplete="name" required aria-required="true" aria-describedby="err1"></div><div class="f"><label for="q-empresa">Empresa <span>(opcional)</span></label><input id="q-empresa" name="empresa" type="text" autocomplete="organization"></div></div></fieldset>
@@ -441,7 +443,7 @@ def page_orcamento():
       </div>
     </div>
     <div class="sum" id="resumo" role="region" aria-labelledby="h-sum">
-      <div class="sum-head"><p class="kicker">seu pedido</p><b id="h-sum">Resumo</b></div>
+      <div class="sum-head"><b id="h-sum">Resumo do pedido</b></div>
       <div class="sum-body">
         <dl id="sumList"></dl><p class="sr" id="sumLive" aria-live="polite"></p>
         <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);padding-top:.875rem"><span class="small" style="color:var(--ink-muted)">Área total</span><b id="sumArea" class="num sum-area empty">a definir</b></div>
@@ -449,6 +451,7 @@ def page_orcamento():
         <p class="badge warn" id="urgent" hidden>Evento próximo: envie o pedido o quanto antes para confirmarmos o prazo.</p>
         <p class="badge warn" id="past" hidden>Essa data já passou. Confira o dia do evento.</p>
         <p class="err" id="errS" role="alert"></p>
+        <div class="sent" id="sent" role="status" hidden><p><b>Pedido aberto no WhatsApp.</b> Não abriu? Copie a mensagem e envie para (11) 91010-1324.</p><button type="button" class="btn btn-line btn-sm" id="copyMsg">Copiar mensagem</button></div>
         <a class="btn btn-fill" id="sendWa" href="https://wa.me/{WA_NUM}" target="_blank" rel="noopener" data-cta="quote-wa">{WA_SVG}Enviar pelo WhatsApp</a>
         <a class="btn btn-line" id="sendMail" href="mailto:atendimento@smartpix.com.br" data-cta="quote-mail" style="min-height:3rem">Enviar por e-mail</a>
         <small>Seg a sex, 8h às 18h · A mensagem abre pronta no seu aplicativo</small>

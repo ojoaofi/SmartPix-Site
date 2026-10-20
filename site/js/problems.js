@@ -13,18 +13,24 @@
     function paint(v) { var c = Math.max(0, Math.min(100, v)), r = Math.round(c); ba.style.setProperty('--x', c.toFixed(2) + '%'); if (+handle.getAttribute('aria-valuenow') !== r) { handle.setAttribute('aria-valuenow', r); handle.setAttribute('aria-valuetext', r + '% antes, ' + (100 - r) + '% depois'); } }
     function to(t, cfg) { x.to = t; if (cfg) x.config(cfg[0], cfg[1]); if (SP.reduce) { x.x = t; x.v = 0; paint(t); return; } if (!anim || !anim.alive) anim = SP.run(x, paint, null, 0.02); }
     function pct(e) { var b = ba.getBoundingClientRect(); return (e.clientX - b.left) / b.width * 100; }
+    var off = 0, chase = false;
     ba.addEventListener('pointerdown', function (e) {
-      drag = true; if (anim) anim.stop(); x.v = 0; tr = new SP.Tracker();
-      var p = pct(e); x.x = p; tr.add(p, e.timeStamp); paint(p);
+      drag = true; tr = new SP.Tracker();
+      var p = pct(e), cur = x.x, hw = 1.375 * 16 / ba.getBoundingClientRect().width * 100;
+      if (Math.abs(p - cur) <= hw) { /* grabbed the divider: keep the grab offset, track 1:1 */ if (anim) anim.stop(); x.v = 0; off = cur - p; chase = false; }
+      else { /* tapped elsewhere: the divider travels to the finger on a spring, then follows */ off = 0; chase = true; to(p, [1, 0.28]); }
+      tr.add(cur, e.timeStamp);
       try { ba.setPointerCapture(e.pointerId); } catch (_) {}
       if (!used) { used = true; SP.track('problem_compare', { problem: panel.id }); }
     });
     ba.addEventListener('pointermove', function (e) {
-      if (!drag) return; var p = pct(e), over = p < 0 ? p : p > 100 ? p - 100 : 0;
-      x.x = over ? (p < 0 ? SP.rubberband(over, 100) : 100 + SP.rubberband(over, 100)) : p; tr.add(x.x, e.timeStamp); paint(x.x);
+      if (!drag) return; var p = pct(e) + off, over = p < 0 ? p : p > 100 ? p - 100 : 0, t = over ? (p < 0 ? SP.rubberband(over, 100) : 100 + SP.rubberband(over, 100)) : p;
+      if (chase && Math.abs(t - x.x) > 1.5 && anim && anim.alive) { x.to = t; tr.add(x.x, e.timeStamp); return; }
+      chase = false; if (anim) anim.stop(); x.x = t; x.to = t; tr.add(t, e.timeStamp); paint(t);
     });
     function up() {
       if (!drag) return; drag = false;
+      if (chase) { chase = false; return; } /* a tap: let the spring finish at the tapped point */
       var v = tr.v(), end = x.x + SP.project(v, 0.99), target = end < 10 ? 0 : end > 90 ? 100 : Math.max(0, Math.min(100, end));
       x.v = v; to(target, [0.8, 0.3]);
     }

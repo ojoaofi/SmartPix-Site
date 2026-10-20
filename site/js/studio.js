@@ -75,10 +75,19 @@
   /* ---------- WebGL ---------- */
   var hasGL = (function () { try { var c = D.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); } catch (e) { return false; } })();
   var schedule = function () {};
-  if (!hasGL || (navigator.connection && navigator.connection.saveData)) return;
+  /* Without WebGL (or with data saver on) the panel still answers: the 5 × 3 m lona is drawn flat with the visitor's brand. */
+  function flat() {
+    if (root.classList.contains('gl') || root.classList.contains('flat')) return;
+    var holder = root.querySelector('.studio-3d'), cv = D.createElement('canvas'); cv.className = 'flat-lona'; cv.setAttribute('aria-hidden', 'true');
+    holder.appendChild(cv); root.classList.add('flat');
+    function draw() { var a = art('lona', brand(), state.color); cv.width = a.width / 2; cv.height = a.height / 2; cv.getContext('2d').drawImage(a, 0, 0, cv.width, cv.height); }
+    schedule = function () { requestAnimationFrame(draw); }; draw();
+  }
+  if (!hasGL || (navigator.connection && navigator.connection.saveData)) { flat(); return; }
   function load() {
     var s = D.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.crossOrigin = 'anonymous';
-    s.onload = function () { try { init(); } catch (e) { console.warn('studio', e); } };
+    s.onload = function () { try { init(); } catch (e) { console.warn('studio', e); flat(); } };
+    s.onerror = flat;
     D.head.appendChild(s);
   }
   if (D.readyState === 'complete') setTimeout(load, 30); else addEventListener('load', function () { setTimeout(load, 30); });
