@@ -1,0 +1,53 @@
+<!-- @dsCard height=320 -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><link rel="stylesheet" href="../../tokens.css"><link rel="stylesheet" href="../bundle.css">
+<title>Smart Pix</title>
+<style>
+  html, body { margin:0; height:100%; }
+  body { background:var(--surface); color:var(--ink); font-family:var(--font-display); overflow:hidden; }
+  .cover { position:relative; height:320px; overflow:hidden; }
+  .art { position:absolute; top:0; left:480px; width:480px; height:320px; overflow:hidden; }
+  .art svg { display:block; width:480px; height:320px; }
+  .lime { fill:var(--lime); }
+  .slab { fill:var(--ink); }
+  .graphite { fill:var(--graphite); }
+  .soft { fill:var(--lime-soft); }
+  .cut { fill:var(--surface); }
+  .onlime { fill:var(--on-lime); }
+  .sq { rx:var(--radius-none); }
+  .words { position:absolute; left:var(--space-6); bottom:var(--space-6); max-width:440px; }
+  .name { margin:0; font-size:112px; line-height:.95; font-weight:600; letter-spacing:-.035em; color:var(--ink); }
+  .tag { margin:var(--space-2) 0 0 4px; font-family:var(--font-body); font-size:14px; line-height:20px; color:var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="0 0 480 320" width="480" height="320">
+<!--
+  blocks      lime 168×288 bled off the top (the selo, the identity colour, largest) · ink 312×208 bled off the right (the black of "PIX" and the stage sections) · graphite 128×56 bled off the top (the grey of "smart") · lime-soft 168×56 (relief) — about a third of 960×320
+  arrangement one tall lime slab with satellites, square corners like the full-bleed sections and 2-up tiles, gutters space-4
+  pattern     the X slash ("o traço do X é o motivo gráfico da marca"): parallelograms leaning 31° like the white arm of the X — three lime and one cut in surface across the ink block, two on-lime cut into the lime slab
+  scales      gutters space-4 (16); slash pitch space-7 (48), slash 28×96; corners radius-none
+-->
+<rect class="lime sq" x="0" y="-32" width="168" height="288"/>
+<rect class="graphite sq" x="184" y="-24" width="128" height="56"/>
+<rect class="soft sq" x="328" y="-24" width="168" height="56"/>
+<rect class="slab sq" x="184" y="48" width="312" height="208"/>
+<polygon class="onlime" points="74,120 102,120 44,216 16,216"/>
+<polygon class="onlime" points="122,120 150,120 92,216 64,216"/>
+<polygon class="lime" points="266,104 294,104 236,200 208,200"/>
+<polygon class="lime" points="314,104 342,104 284,200 256,200"/>
+<polygon class="lime" points="362,104 390,104 332,200 304,200"/>
+<polygon class="cut" points="410,104 438,104 380,200 352,200"/>
+</svg>
+</div>
+<div class="words">
+<p class="name">Smart<br>Pix</p>
+<p class="tag">Sua marca em tamanho real.</p>
+</div>
+</div>
+</body>
+</html>
