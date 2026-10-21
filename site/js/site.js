@@ -78,9 +78,9 @@
   var btn = D.getElementById('menuBtn'), sheet = D.getElementById('sheet'), scrim = D.getElementById('scrim');
   if (btn && sheet) {
     var sp = new Spring({ from: 0, to: 0, damping: 1, response: 0.32 }), anim = null, open = false;
-    function paint(p) { sheet.style.transform = 'scale(' + (0.6 + 0.4 * p).toFixed(4) + ')'; sheet.style.opacity = Math.max(0, Math.min(1, p)).toFixed(3); }
+    function paint(p) { /* the menu unfolds down out of the bar and folds back into it */ sheet.style.transform = 'translateY(' + (-14 * (1 - p)).toFixed(2) + 'px)'; sheet.style.opacity = Math.max(0, Math.min(1, p)).toFixed(3); }
     function setOpen(v) {
-      open = v; btn.setAttribute('aria-expanded', v); scrim.classList.toggle('open', v);
+      open = v; btn.setAttribute('aria-expanded', v); scrim.classList.toggle('open', v); D.documentElement.style.overflow = v ? 'hidden' : ''; btn.setAttribute('aria-label', v ? 'Fechar menu' : 'Abrir menu'); if (nav) nav.classList.toggle('menu-open', v);
       if (v) { sheet.classList.add('vis'); sheet.removeAttribute('inert'); }
       [D.querySelector('main'), D.querySelector('.foot'), D.getElementById('dock'), D.querySelector('.nav-links'), D.querySelector('.brand'), D.querySelector('.nav-wa'), D.querySelector('.nav-cta')].forEach(function (el) { if (el) el.inert = v; });
       sp.to = v ? 1 : 0;
