@@ -16,7 +16,7 @@
   Spring.prototype.settled = function (eps) { eps = eps || 0.001; return Math.abs(this.x - this.to) < eps && Math.abs(this.v) < eps * 10; };
   function run(spring, onUpdate, onDone, eps) {
     var last = 0, raf = 0, alive = true;
-    function f(t) { if (!alive) return; var dt = last ? Math.min(0.05, (t - last) / 1000) : 1 / 60; last = t; onUpdate(spring.step(dt)); if (spring.settled(eps)) { spring.x = spring.to; spring.v = 0; onUpdate(spring.x); alive = false; if (onDone) onDone(); return; } raf = requestAnimationFrame(f); }
+    function f(t) { if (!alive) return; var dt = last ? Math.min(0.1, (t - last) / 1000) : 1 / 60; last = t; onUpdate(spring.step(dt)); if (spring.settled(eps)) { spring.x = spring.to; spring.v = 0; onUpdate(spring.x); alive = false; if (onDone) onDone(); return; } raf = requestAnimationFrame(f); }
     raf = requestAnimationFrame(f);
     return { stop: function () { alive = false; cancelAnimationFrame(raf); }, get alive() { return alive; } };
   }
@@ -131,8 +131,8 @@
   /* ---------- Rails: touch uses native scrolling; mouse gets 1:1 drag, momentum projected to the nearest card, spring settle ---------- */
   D.querySelectorAll('[data-rail]').forEach(function (wrap) {
     var rail = wrap.querySelector('.rail'); if (!rail) return;
-    var cards = [].slice.call(rail.querySelectorAll('.card')), sp = new Spring({ damping: 1, response: 0.45 }), anim = null, band = new Spring({ damping: 1, response: 0.4 }), bandAnim = null;
-    function stops() { var pad = parseFloat(getComputedStyle(rail).scrollPaddingLeft) || 0, max = rail.scrollWidth - rail.clientWidth; return cards.map(function (c) { return Math.max(0, Math.min(max, c.offsetLeft - pad)); }).concat([max]); }
+    var cards = [].slice.call(rail.children), sp = new Spring({ damping: 1, response: 0.45 }), anim = null, band = new Spring({ damping: 1, response: 0.4 }), bandAnim = null;
+    function stops() { var pad = parseFloat(getComputedStyle(rail).paddingLeft) || 0, /* scroll-padding mirrors the padding; its computed value can stay unresolved */ max = rail.scrollWidth - rail.clientWidth; return cards.map(function (c) { return Math.max(0, Math.min(max, c.offsetLeft - pad)); }).concat([max]); }
     function nearest(x) { return stops().reduce(function (b, s) { return Math.abs(s - x) < Math.abs(b - x) ? s : b; }, 0); }
     function snapOff() { rail.style.scrollSnapType = 'none'; }
     function snapOn() { rail.style.scrollSnapType = ''; }
@@ -172,6 +172,10 @@
     rail.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
     rail.addEventListener('dragstart', function (e) { e.preventDefault(); });
     rail.addEventListener('wheel', function () { if (anim) { anim.stop(); snapOn(); } }, { passive: true });
+    /* arrows dim at the ends, like Apple's galleries */
+    var prev = wrap.querySelector('[data-dir="-1"]'), next = wrap.querySelector('[data-dir="1"]');
+    function ends() { var max = rail.scrollWidth - rail.clientWidth; if (prev) prev.disabled = rail.scrollLeft <= 2; if (next) next.disabled = rail.scrollLeft >= max - 2; }
+    rail.addEventListener('scroll', function () { requestAnimationFrame(ends); }, { passive: true }); addEventListener('resize', ends); ends();
   });
 
   /* ---------- Horizontal sub-navigation: fade only the edge that has more content ---------- */

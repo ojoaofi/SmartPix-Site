@@ -307,29 +307,24 @@ def page_home():
     </ol>
   </div>
 </section>'''
-    tablist = ''.join(f'<li role="presentation"><button type="button" role="tab" id="t-{p[0]}" aria-controls="p-{p[0]}" aria-selected="{str(i == 0).lower()}" tabindex="{0 if i == 0 else -1}"><i aria-hidden="true">{i + 1:02d}</i>{p[1]}</button></li>' for i, p in enumerate(PROBLEMS))
-    panels = ''
+    SHORT = {'emenda': 'Até 5 m numa peça só.', 'cor': 'Toda a parte gráfica na mesma produção.', 'instalacao': 'A gente leva e monta.', 'fornecedores': 'Um pedido. Um responsável.',
+             'piso': 'O chão vira mídia.', 'sigilo': 'O parceiro de produção da sua agência.', 'lojas': 'A mesma campanha em todas as lojas.', '3d': 'Impressão 3D na mesma produção.'}
+    cards = ''
     for i, p in enumerate(PROBLEMS):
         slug, title, bimg, kind, aimg, prob, sol, prod = p
         qq = f'orcamento.html?origem=problema&amp;produto={e(prod).replace(" ", "%20").replace("/", "%2F")}&amp;problema={e(title).replace(" ", "%20")}'
-        panels += f'''<div class="px-view" role="tabpanel" id="p-{slug}" aria-labelledby="t-{slug}"{' hidden' if i else ''}>
-  <div class="ba" style="--x:50%">
-    {pic(aimg, 'Ilustração gerada por IA. Com a Smart Pix: ' + sol, sizes='(max-width:900px) 100vw, 46rem')}
-    <div class="before" aria-hidden="true">{ba_before(kind, bimg, '')}</div>
-    <span class="badge-b">Antes</span><span class="badge-a">Com a Smart Pix</span>
-    <button type="button" class="handle" role="slider" aria-label="Comparar antes e depois" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/></svg></span></button>
-    <span class="ai">{AI}</span>
-  </div>
-  <h3 class="sr">{title}</h3>
-  <div class="px-text"><div><p class="lbl">O problema</p><p>{prob}</p></div><div class="sol"><p class="lbl">Como resolvemos</p><p>{sol}</p></div></div>
-  <div class="px-foot"><p class="caption">Arraste a divisória para comparar.</p><a class="btn btn-fill" href="{qq}" data-cta="problem-{slug}">Resolver no meu projeto</a></div>
-</div>'''
+        cards += f'''<article class="pc" id="pc-{slug}" aria-labelledby="pc-t-{slug}">
+  <div class="pc-img">{pic(aimg, '', sizes='(max-width:734px) 82vw, 24rem')}</div>
+  <div class="pc-front"><p class="pc-eyebrow">O problema</p><h3 id="pc-t-{slug}" class="pc-title">{title}.</h3><p class="pc-text">{prob}</p></div>
+  <div class="pc-back" id="pc-b-{slug}" aria-hidden="true" inert><p class="pc-eyebrow lime">Com a Smart Pix</p><p class="pc-title">{SHORT[slug]}</p><p class="pc-text">{sol}</p><a class="btn btn-fill btn-sm" href="{qq}" data-cta="problem-{slug}">Resolver no meu projeto</a></div>
+  <span class="tag">{AI}</span>
+  <button type="button" class="pc-toggle" aria-expanded="false" aria-controls="pc-b-{slug}"><span class="sr">Ver como resolvemos: {title.lower()}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+</article>'''
     problemas = f'''
-<section class="sec dark" id="problemas" aria-labelledby="h-px">
-  <div class="wrap">
-    <div class="sec-head center">{kicker('problemas que resolvemos')}<h2 id="h-px" class="h1">Já passou por isso?</h2><p class="lead">Escolha um problema e arraste para ver o que muda com a Smart Pix.</p></div>
-    <div class="px" id="px"><ul class="px-list" role="tablist" aria-label="Problemas">{tablist}</ul><div>{panels}</div></div>
-  </div>
+<section class="sec gray" id="problemas" aria-labelledby="h-px" data-rail>
+  <div class="wrap px-head">{kicker('problemas que resolvemos')}<h2 id="h-px" class="h1">Já passou por isso?</h2><p class="lead">Toque no + para ver como a Smart Pix resolve.</p></div>
+  <div class="rail" tabindex="0" role="region" aria-label="Problemas que resolvemos">{cards}</div>
+  <div class="wrap rail-nav"><button type="button" data-dir="-1" aria-label="Problema anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button type="button" data-dir="1" aria-label="Próximo problema"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
 </section>'''
     faq = ''.join(f'<details><summary>{qq}<i aria-hidden="true"></i></summary><p>{a}</p></details>' for qq, a in FAQ)
     end = f'''
