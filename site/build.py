@@ -21,10 +21,9 @@ def img(name, alt, sizes='100vw', w=1536, h=863, lazy=True, small=800, cls='', s
     return (f'<img src="img/{name}-{w}.webp" srcset="img/{name}-{small}.webp {small}w, img/{name}-{w}.webp {w}w" sizes="{sizes}" '
             f'alt="{e(alt)}" width="{w}" height="{h}"' + (' loading="lazy" decoding="async"' if lazy else ' fetchpriority="high"') +
             (f' class="{cls}"' if cls else '') + (f' style="{style}"' if style else '') + '>')
-IMGS = {  # name: (w, h, small)
- 'ai-install': (1536, 863, 800), 'ai-stage': (1536, 863, 800), 'ai-vitrine': (1536, 863, 800), 'ai-van': (1536, 863, 800), 'ai-facade': (1536, 863, 800),
- 'ai-print3d': (1536, 863, 800), 'ai-whitelabel': (1536, 863, 800), 'ai-floor': (1500, 843, 800), 'ai-booth': (1200, 674, 700), 'ai-printer': (1500, 843, 800),
- 'ai-materials': (1200, 674, 700), 'ai-roll': (1200, 674, 700), 'ai-macro': (1200, 594, 700), 'real-fabrica': (1440, 1440, 800)}
+IMGS = {  # name: (w, h, small) — ilustrações IA v9: luz natural, paleta da marca (verde-limão + grafite), sem marcas
+ **{n: (1536, 863, 800) for n in ['ai-printer', 'ai-stage', 'ai-install', 'ai-floor', 'ai-booth', 'ai-facade', 'ai-van', 'ai-vitrine', 'ai-print3d', 'ai-whitelabel', 'ai-materials']},
+ 'real-fabrica': (1440, 1440, 800)}
 def pic(name, alt, sizes='100vw', lazy=True, cls='', style=''):
     w, h, s = IMGS[name]; return img(name, alt, sizes, w, h, lazy, s, cls, style)
 
@@ -210,16 +209,16 @@ FAQ = [
 
 # ------------------------------------------------------------------ pages
 XL = [  # id, title, line, img, quote value, alt, theme
- ('lona', 'Lona sem emenda', 'Até 5 metros. Uma peça só.', 'ai-install', 'Lona / backdrop', 'Ilustração gerada por IA: equipe instalando um painel de lona de 5 metros num estande', 'dark'),
- ('smart-floor', 'Smart Floor', 'O chão também comunica.', 'ai-floor', 'Smart Floor', 'Ilustração gerada por IA: piso vinílico impresso em cores atravessando um salão de eventos', 'dark'),
+ ('lona', 'Lona sem emenda', 'Até 5 metros. Uma peça só.', 'ai-printer', 'Lona / backdrop', 'Ilustração gerada por IA: impressora de grande formato imprimindo uma lona inteira, que se estende pelo chão do galpão', 'light'),
+ ('smart-floor', 'Smart Floor', 'O chão também comunica.', 'ai-floor', 'Smart Floor', 'Ilustração gerada por IA: faixa de piso vinílico impresso em verde-limão e grafite no corredor de uma feira', 'light'),
 ]
 GRID = [  # id, title, line, img, href, quote value, theme
- ('cenografia', 'Cenografia e estandes', 'O cenário inteiro, num pedido só.', 'ai-booth', 'solucoes.html#cenografia', 'Estande completo', 'dark'),
+ ('cenografia', 'Cenografia e estandes', 'O cenário inteiro, num pedido só.', 'ai-booth', 'solucoes.html#cenografia', 'Estande completo', 'light'),
  ('letras-caixa', 'Letras-caixa e fachadas', 'A marca em três dimensões.', 'ai-facade', 'solucoes.html#letras-caixa', 'Letra-caixa / fachada', 'dark'),
- ('frota', 'Envelopamento de frota', 'A marca que roda a cidade.', 'ai-van', 'solucoes.html#frota', 'Envelopamento de frota', 'dark'),
+ ('frota', 'Envelopamento de frota', 'A marca que roda a cidade.', 'ai-van', 'solucoes.html#frota', 'Envelopamento de frota', 'light'),
  ('vitrines', 'Vitrines e PDV', 'A mesma campanha em todas as lojas.', 'ai-vitrine', 'solucoes.html#vitrines', 'Vitrine / adesivo', 'light'),
  ('impressao-3d', 'Impressão 3D', 'Formas que a impressão plana não faz.', 'ai-print3d', 'solucoes.html#impressao-3d', 'Impressão 3D', 'light'),
- ('parceiros', 'Para cenografia e agências', 'Você atende o cliente. A gente produz.', 'ai-whitelabel', 'cenografia.html', 'Estande completo', 'dark'),
+ ('parceiros', 'Para cenografia e agências', 'Você atende o cliente. A gente produz.', 'ai-whitelabel', 'cenografia.html', 'Estande completo', 'light'),
 ]
 def cta_end(key, title='Qual é o seu próximo projeto?', perfil=''):
     href = 'orcamento.html' + (f'?perfil={perfil}' if perfil else '')
@@ -262,7 +261,7 @@ def page_home():
     {btns(('orcamento.html', 'Pedir orçamento'), ('solucoes.html', 'Ver soluções'), 'hero')}
     <p class="hero-link"><a class="link" href="cenografia.html" data-cta="hero-partner">É de cenografia ou agência? Conheça a parceria</a></p>
   </div>
-  <figure class="hero-img">{pic('ai-stage', 'Ilustração gerada por IA: palco com painel de lona impressa em verde-limão e preto, sem emenda', lazy=False, sizes='100vw')}<figcaption class="tag">{AI}</figcaption></figure>
+  <figure class="hero-img">{pic('ai-stage', 'Ilustração gerada por IA: palco de evento com um painel de lona de 5 metros, sem emenda, em verde-limão, branco e grafite', lazy=False, sizes='100vw')}<figcaption class="tag">{AI}</figcaption></figure>
   <ul class="wrap hl" aria-label="Destaques">
     <li><b>5 m</b><span>de largura sem emenda</span></li>
     <li><b>UV LED</b><span>tinta curada na hora</span></li>
