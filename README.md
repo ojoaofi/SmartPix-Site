@@ -21,6 +21,18 @@ python3 -m http.server 8000
 # abra http://localhost:8000
 ```
 
+## Configuração do build
+
+| Variável | Para quê | Padrão |
+|---|---|---|
+| `SITE_URL` | endereço público (canonical, sitemap, Open Graph) | `https://ojoaofi.github.io/SmartPix-Site/` |
+| `INDEXAR=1` | libera o Google (sem ela, todas as páginas saem com `noindex`) | desligado (piloto) |
+| `GTM_ID` | Google Tag Manager; os eventos de clique e de orçamento já vão para o `dataLayer` | vazio |
+
+Exemplo: `SITE_URL=https://www.dominio.com.br/ INDEXAR=1 GTM_ID=GTM-XXXX python3 site/build.py`
+
+A auditoria mais recente está em [`docs/auditoria-v8.md`](docs/auditoria-v8.md).
+
 ## Pendências para confirmar com a Smart Pix
 
 - Equipe de instalação própria (o site afirma; só a frota própria está confirmada).

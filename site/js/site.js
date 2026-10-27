@@ -180,7 +180,7 @@
 
   /* ---------- Horizontal sub-navigation: fade only the edge that has more content ---------- */
   D.querySelectorAll('.subnav ul').forEach(function (u) {
-    var w = u.parentNode;
+    var w = u;
     function f() { w.classList.toggle('fade-l', u.scrollLeft > 4); w.classList.toggle('fade-r', u.scrollLeft < u.scrollWidth - u.clientWidth - 4); }
     u.addEventListener('scroll', f, { passive: true }); addEventListener('resize', f); f();
   });

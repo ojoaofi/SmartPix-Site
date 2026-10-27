@@ -16,30 +16,30 @@ Dados da empresa (conforme o site):
 
 ## Páginas principais
 
-- [Início](https://smartpix.com.br/): visão geral, estúdio 3D para visualizar um estande com a sua marca, problemas que a empresa resolve e perguntas frequentes.
-- [Soluções](https://smartpix.com.br/solucoes.html): lona e backdrop até 5 m sem emenda, Smart Floor, cenografia e estandes, letras-caixa e fachadas, vitrines e PDV, envelopamento de frota, impressão 3D e materiais.
-- [Para cenografia, montadoras e agências](https://smartpix.com.br/cenografia.html): como funciona a produção terceirizada, entrega no pavilhão, montagem e o que enviar no primeiro contato.
-- [Projetos](https://smartpix.com.br/projetos.html): tipos de projeto produzidos e instalados (convenções, feiras e estandes, montagem no local, varejo e vitrines, fachadas e letras-caixa, pisos, frota, cenografia em 3D, produção para agências).
-- [Pedir orçamento](https://smartpix.com.br/orcamento.html): formulário em 2 etapas que envia o pedido pronto pelo WhatsApp ou por e-mail.
+- [Início](https://ojoaofi.github.io/SmartPix-Site/): visão geral, estúdio 3D para visualizar um estande com a sua marca, problemas que a empresa resolve e perguntas frequentes.
+- [Soluções](https://ojoaofi.github.io/SmartPix-Site/solucoes.html): lona e backdrop até 5 m sem emenda, Smart Floor, cenografia e estandes, letras-caixa e fachadas, vitrines e PDV, envelopamento de frota, impressão 3D e materiais.
+- [Para cenografia, montadoras e agências](https://ojoaofi.github.io/SmartPix-Site/cenografia.html): como funciona a produção terceirizada, entrega no pavilhão, montagem e o que enviar no primeiro contato.
+- [Projetos](https://ojoaofi.github.io/SmartPix-Site/projetos.html): tipos de projeto produzidos e instalados (convenções, feiras e estandes, montagem no local, varejo e vitrines, fachadas e letras-caixa, pisos, frota, cenografia em 3D, produção para agências).
+- [Pedir orçamento](https://ojoaofi.github.io/SmartPix-Site/orcamento.html): formulário em 2 etapas que envia o pedido pronto pelo WhatsApp ou por e-mail.
 
 ## Soluções
 
-- [Lona e backdrop sem emenda](https://smartpix.com.br/solucoes.html#lona): até 5 m de largura numa peça só, em lona e lona backlight, impressão UV LED, com entrega e montagem pela equipe própria.
-- [Smart Floor](https://smartpix.com.br/solucoes.html#smart-floor): piso vinílico impresso em UV LED, sob medida, para corredores, palcos, estandes e ativações.
-- [Cenografia e estandes](https://smartpix.com.br/solucoes.html#cenografia): parte gráfica completa do estande ou palco em lona, tecido, piso, ACM, PVC, adesivo e impressão 3D, num pedido só.
-- [Letras-caixa e fachadas](https://smartpix.com.br/solucoes.html#letras-caixa): em ACM e acrílico, para lojas, recepções e cenários, com produção e instalação próprias.
-- [Vitrines e PDV](https://smartpix.com.br/solucoes.html#vitrines): adesivos de vitrine e materiais de ponto de venda iguais em todas as lojas de uma rede.
-- [Envelopamento de frota](https://smartpix.com.br/solucoes.html#frota): carros, vans e caminhões, com impressão e aplicação pela mesma empresa.
-- [Impressão 3D](https://smartpix.com.br/solucoes.html#impressao-3d): peças cenográficas e displays produzidos junto com a parte gráfica.
-- [Materiais](https://smartpix.com.br/solucoes.html#materiais): lona e lona backlight, tecido, ACM, PVC expandido, adesivo vinil e piso vinílico; o substrato é indicado pelo uso (dentro ou fora, por quanto tempo, com ou sem luz).
+- [Lona e backdrop sem emenda](https://ojoaofi.github.io/SmartPix-Site/solucoes.html#lona): até 5 m de largura numa peça só, em lona e lona backlight, impressão UV LED, com entrega e montagem pela equipe própria.
+- [Smart Floor](https://ojoaofi.github.io/SmartPix-Site/solucoes.html#smart-floor): piso vinílico impresso em UV LED, sob medida, para corredores, palcos, estandes e ativações.
+- [Cenografia e estandes](https://ojoaofi.github.io/SmartPix-Site/solucoes.html#cenografia): parte gráfica completa do estande ou palco em lona, tecido, piso, ACM, PVC, adesivo e impressão 3D, num pedido só.
+- [Letras-caixa e fachadas](https://ojoaofi.github.io/SmartPix-Site/solucoes.html#letras-caixa): em ACM e acrílico, para lojas, recepções e cenários, com produção e instalação próprias.
+- [Vitrines e PDV](https://ojoaofi.github.io/SmartPix-Site/solucoes.html#vitrines): adesivos de vitrine e materiais de ponto de venda iguais em todas as lojas de uma rede.
+- [Envelopamento de frota](https://ojoaofi.github.io/SmartPix-Site/solucoes.html#frota): carros, vans e caminhões, com impressão e aplicação pela mesma empresa.
+- [Impressão 3D](https://ojoaofi.github.io/SmartPix-Site/solucoes.html#impressao-3d): peças cenográficas e displays produzidos junto com a parte gráfica.
+- [Materiais](https://ojoaofi.github.io/SmartPix-Site/solucoes.html#materiais): lona e lona backlight, tecido, ACM, PVC expandido, adesivo vinil e piso vinílico; o substrato é indicado pelo uso (dentro ou fora, por quanto tempo, com ou sem luz).
 
 ## Perguntas frequentes
 
-- [Qual o maior tamanho sem emenda?](https://smartpix.com.br/#duvidas): até 5 metros de largura numa peça só, em impressão UV LED.
-- [Fazem a instalação?](https://smartpix.com.br/#duvidas): sim, com frota própria e equipe de instalação.
-- [Onde vocês atendem?](https://smartpix.com.br/#duvidas): a produção fica em Atibaia, perto de São Paulo; para outras cidades, informar o local no orçamento.
-- [Preciso ter a arte pronta?](https://smartpix.com.br/#duvidas): não; o planejamento faz parte do serviço.
+- [Qual o maior tamanho sem emenda?](https://ojoaofi.github.io/SmartPix-Site/#duvidas): até 5 metros de largura numa peça só, em impressão UV LED.
+- [Fazem a instalação?](https://ojoaofi.github.io/SmartPix-Site/#duvidas): sim, com frota própria e equipe de instalação.
+- [Onde vocês atendem?](https://ojoaofi.github.io/SmartPix-Site/#duvidas): a produção fica em Atibaia, perto de São Paulo; para outras cidades, informar o local no orçamento.
+- [Preciso ter a arte pronta?](https://ojoaofi.github.io/SmartPix-Site/#duvidas): não; o planejamento faz parte do serviço.
 
 ## Optional
 
-- [Problemas que resolvemos](https://smartpix.com.br/#problemas): emenda na foto, cor diferente entre peças, gráfica que não instala, muitos fornecedores para um estande, piso sem comunicação, fornecedor aparente para o cliente final, vitrines diferentes por loja e peças cenográficas 3D.
+- [Problemas que resolvemos](https://ojoaofi.github.io/SmartPix-Site/#problemas): emenda na foto, cor diferente entre peças, gráfica que não instala, muitos fornecedores para um estande, piso sem comunicação, fornecedor aparente para o cliente final, vitrines diferentes por loja e peças cenográficas 3D.

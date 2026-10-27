@@ -6,6 +6,8 @@
   var $ = function (s) { return form.querySelector(s); }, $$ = function (s) { return [].slice.call(form.querySelectorAll(s)); };
   var step2 = D.getElementById('step2'), err1 = D.getElementById('err1'), errS = D.getElementById('errS');
   var waBtn = D.getElementById('sendWa'), mailBtn = D.getElementById('sendMail'), list = D.getElementById('sumList');
+  var stBox = D.getElementById('qSticky'), stBtn = D.getElementById('qStickyBtn'), stTxt = D.getElementById('qStickyTxt');
+  if (stBtn) { stBtn.target = '_blank'; stBtn.rel = 'noopener'; }
   var started = false, KEY = 'sp_quote', sumLive = D.getElementById('sumLive'), liveT = 0, dockBtn = D.getElementById('dockMain');
   if (dockBtn) { dockBtn.target = '_blank'; dockBtn.rel = 'noopener'; }
 
@@ -56,6 +58,7 @@
     var area = D.getElementById('sumArea'); area.textContent = d.sized ? fmt(d.w * d.h * d.q) + ' m²' : 'a definir'; area.classList.toggle('empty', !d.sized);
     clearTimeout(liveT); liveT = setTimeout(function () { var t = 'Resumo: ' + (d.produtos.length ? d.produtos.length + (d.produtos.length === 1 ? ' produto' : ' produtos') : 'nenhum produto') + (d.sized ? ', ' + fmt(d.w * d.h * d.q) + ' m²' : '') + '.'; if (sumLive.textContent !== t) sumLive.textContent = t; }, 900);
     if (dockBtn) dockBtn.href = SP.waLink(message(d));
+    if (stBtn) { stBtn.href = SP.waLink(message(d)); stTxt.textContent = (d.produtos.length ? d.produtos.join(', ') : 'Resumo do pedido') + (d.sized ? ' · ' + fmt(d.w * d.h * d.q) + ' m²' : ''); }
     var seam = D.getElementById('seam'), lona = d.produtos.some(function (p) { return /Lona|Estande/.test(p); });
     seam.hidden = !(lona && d.sized); if (!seam.hidden) { var ok = Math.min(d.w, d.h) <= 5; seam.className = 'badge' + (ok ? '' : ' warn'); seam.textContent = ok ? 'Cabe numa peça só: até 5 m de largura sem emenda.' : 'Acima de 5 m nos dois lados, a lona é feita em partes.'; }
     var urg = D.getElementById('urgent'); urg.hidden = !(d.days != null && d.days >= 0 && d.days <= 7);
@@ -112,6 +115,14 @@
   waBtn.addEventListener('click', send('whatsapp'));
   mailBtn.addEventListener('click', send('email'));
   if (dockBtn) dockBtn.addEventListener('click', send('whatsapp'));
+  if (stBtn) stBtn.addEventListener('click', send('whatsapp'));
+  /* the phone send bar shows once the visitor starts and hides while the summary itself is on screen */
+  if (stBox && 'IntersectionObserver' in window) {
+    var sumVis = false, sumEl = D.getElementById('resumo');
+    function stUpdate() { var on = started && !sumVis; stBox.classList.toggle('on', on); stBox.setAttribute('aria-hidden', !on); stBtn.tabIndex = on ? 0 : -1; }
+    new IntersectionObserver(function (es) { sumVis = es[0].isIntersecting; stUpdate(); }, { threshold: 0.15 }).observe(sumEl);
+    form.addEventListener('input', stUpdate); form.addEventListener('change', stUpdate);
+  }
   var cm = D.getElementById('copyMsg');
   if (cm) cm.addEventListener('click', function () { var t = message(data()); try { navigator.clipboard.writeText(t).then(function () { cm.textContent = 'Mensagem copiada'; SP.say('Mensagem copiada'); setTimeout(function () { cm.textContent = 'Copiar mensagem'; }, 1800); }); } catch (e) {} SP.track('copy', { what: 'quote_message' }); });
   var dateEl = form.elements.data; if (dateEl) { var t = new Date(); dateEl.min = t.toISOString().slice(0, 10); }

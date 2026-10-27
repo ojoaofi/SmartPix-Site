@@ -19,6 +19,7 @@
     if (firstSync) { firstSync = false; } else { clearTimeout(liveT); liveT = setTimeout(function () { var t = 'Estande atualizado: ' + b + ', cor ' + cname.toLowerCase() + '.'; if (live && live.textContent !== t) live.textContent = t; }, 800); }
     var p = new URLSearchParams({ origem: 'estudio-3d', produto: 'Estande completo', marca: b, cor: cname });
     quote.href = 'orcamento.html?' + p.toString();
+    quote.textContent = state.name && state.name.trim() ? 'Orçar o estande ' + b : 'Orçar este estande';
     try { sessionStorage.setItem('sp_studio', JSON.stringify(state)); } catch (e) {}
   }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -90,7 +91,12 @@
     s.onerror = flat;
     D.head.appendChild(s);
   }
-  if (D.readyState === 'complete') setTimeout(load, 30); else addEventListener('load', function () { setTimeout(load, 30); });
+  /* three.js (~150 KB) loads only when the studio is about to scroll into view */
+  var started = false;
+  function soon() { if (started) return; started = true; load(); }
+  if ('IntersectionObserver' in window) { var lio = new IntersectionObserver(function (es) { if (es.some(function (x) { return x.isIntersecting; })) { lio.disconnect(); soon(); } }, { rootMargin: '900px 0px' }); lio.observe(root); }
+  else addEventListener('load', soon);
+  input.addEventListener('focus', soon);
 
   function init() {
     var T = THREE, stage = root.querySelector('.studio-stage'), cv = D.getElementById('studioCanvas');

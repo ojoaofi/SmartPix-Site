@@ -121,6 +121,7 @@ p{margin:0}
 /* ---------- home hero: the company, first ---------- */
 .hero{position:relative;overflow:hidden;padding-top:clamp(3.5rem,7vw,5.5rem);text-align:center}
 .hero-mark{width:clamp(4rem,7vw,5.5rem);height:auto;aspect-ratio:1;margin:0 auto 1.25rem}
+.hero h1 span{display:block}
 .hero-title{font-size:clamp(3.5rem,10vw,7.5rem);line-height:1;letter-spacing:-.045em;font-weight:700}
 .hero-sub{text-wrap:balance;margin-top:.75rem;font-size:clamp(1.5rem,3.2vw,2.5rem);line-height:1.12;letter-spacing:-.025em;font-weight:600;color:var(--d-ink)}
 .hero-note{text-wrap:balance;margin-top:.625rem;font-size:clamp(1.0625rem,1.6vw,1.3125rem);line-height:1.35;letter-spacing:-.014em;color:var(--d-ink-2)}
@@ -284,9 +285,9 @@ p{margin:0}
 .subnav a{display:inline-flex;align-items:center;min-height:2.25rem;padding:0 .875rem;border-radius:var(--pill);font-size:.8125rem;white-space:nowrap;text-decoration:none;color:var(--ink-2);transition:background-color .2s,color .2s}
 .subnav a:hover{color:var(--ink)}
 .subnav a.on{background:var(--ink);color:#fff}
-.subnav .wrap.fade-r{-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent)}
-.subnav .wrap.fade-l{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%);mask-image:linear-gradient(90deg,transparent,#000 10%)}
-.subnav .wrap.fade-l.fade-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.subnav ul.fade-r{-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent)}
+.subnav ul.fade-l{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%);mask-image:linear-gradient(90deg,transparent,#000 10%)}
+.subnav ul.fade-l.fade-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
 .prod{scroll-margin-top:calc(var(--nav) + 3.5rem)}
 .prod .sec-head{margin-bottom:var(--s7)}
 .prod-img{position:relative;margin:0;overflow:hidden;border-radius:var(--r3);aspect-ratio:16/9;background:#111}
@@ -470,3 +471,37 @@ body[data-page=orcamento] .nav-cta{display:none}
 @media print{.nav,.sheet,.studio-panel{display:none}}
 .nav.menu-open{background:rgba(250,250,252,.97);color:#1d1d1f}
 @media (pointer:coarse){.tiles .btn,.btn-sm,.chip,.subnav a,.studio-views button{min-height:2.75rem}}
+
+/* ---------- v8 ---------- */
+/* how ordering works, shown wherever a page asks for the order */
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;max-width:52rem;margin:var(--s7) auto 0;padding:0;list-style:none;text-align:left}
+.how li{display:grid;gap:.375rem;align-content:start;padding:1.5rem;border-radius:var(--r3);background:#fff}
+.how .n{display:grid;place-items:center;width:1.75rem;height:1.75rem;border-radius:50%;background:var(--ink);color:#fff;font-size:.8125rem;font-weight:600}
+.how b{margin-top:.5rem;font-size:1.1875rem;line-height:1.2;letter-spacing:-.02em;font-weight:600}
+.how span:not(.n){color:var(--ink-2);font-size:.9375rem;line-height:1.4}
+.cta-end .how + .ctas{margin-top:var(--s6)}
+@media (max-width:734px){.how{grid-template-columns:1fr}}
+/* soluções: local nav carries the primary action, like Apple's product nav */
+.subnav-in{display:flex;align-items:center;gap:1rem}
+.subnav-in ul{flex:1;min-width:0}
+.subnav-cta{flex:none}
+@media (max-width:734px){.subnav-cta{display:none}}
+.pairs{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .75rem;margin-top:var(--s5);font-size:.9375rem}
+.pairs span{color:var(--ink-2)}
+.pairs a{display:inline-flex;align-items:center;min-height:2.75rem;color:var(--ink);text-decoration:none}
+.pairs a::after{content:"›";margin-left:.3em}
+.pairs a:hover{text-decoration:underline}
+/* orçamento: on phones the send action stays under the thumb until the summary is on screen */
+.q-sticky{display:none}
+@media (max-width:960px){
+  .q-sticky{position:fixed;left:0;right:0;bottom:0;z-index:55;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem var(--gutter) calc(.75rem + env(safe-area-inset-bottom,0px));background:rgba(250,250,252,.86);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 -1px 0 rgba(0,0,0,.08);transform:translateY(110%);visibility:hidden;transition:transform .45s var(--ease),visibility 0s .45s}
+  .q-sticky.on{transform:none;visibility:visible;transition:transform .45s var(--ease),visibility 0s}
+  .q-sticky span{min-width:0;font-size:.875rem;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .q-sticky .btn{flex:none;min-height:2.75rem}
+  body[data-page=orcamento] .foot{padding-bottom:calc(5rem + env(safe-area-inset-bottom,0px))}
+}
+@media (prefers-reduced-transparency:reduce){.q-sticky{background:#fafafc}}
+.hero-link{margin-top:1rem}
+.hero-link .link{color:#2997ff;font-size:1.0625rem}
+.hero-link .link:hover{text-decoration:underline}
+.subnav a.subnav-cta{color:#000;background:var(--lime);padding:0 1rem}.subnav a.subnav-cta:hover{background:var(--lime-hi);color:#000}

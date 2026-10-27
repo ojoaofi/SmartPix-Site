@@ -1,26 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url>
-    <loc>https://smartpix.com.br/</loc>
-    <lastmod>2026-10-20</lastmod>
-    <image:image><image:loc>https://smartpix.com.br/img/real-fabrica-1440.webp</image:loc></image:image>
-    <image:image><image:loc>https://smartpix.com.br/img/real-impressora-1000.webp</image:loc></image:image>
-  </url>
-  <url>
-    <loc>https://smartpix.com.br/solucoes.html</loc>
-    <lastmod>2026-10-20</lastmod>
-  </url>
-  <url>
-    <loc>https://smartpix.com.br/cenografia.html</loc>
-    <lastmod>2026-10-20</lastmod>
-  </url>
-  <url>
-    <loc>https://smartpix.com.br/projetos.html</loc>
-    <lastmod>2026-10-20</lastmod>
-    <image:image><image:loc>https://smartpix.com.br/img/real-fabrica-1440.webp</image:loc></image:image>
-  </url>
-  <url>
-    <loc>https://smartpix.com.br/orcamento.html</loc>
-    <lastmod>2026-10-20</lastmod>
-  </url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://ojoaofi.github.io/SmartPix-Site/</loc></url>
+  <url><loc>https://ojoaofi.github.io/SmartPix-Site/solucoes.html</loc></url>
+  <url><loc>https://ojoaofi.github.io/SmartPix-Site/cenografia.html</loc></url>
+  <url><loc>https://ojoaofi.github.io/SmartPix-Site/projetos.html</loc></url>
+  <url><loc>https://ojoaofi.github.io/SmartPix-Site/orcamento.html</loc></url>
 </urlset>

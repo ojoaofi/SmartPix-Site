@@ -1,21 +1,4 @@
-# Smart Pix Impressão Digital — https://smartpix.com.br/
-# Todo o site é público. URLs de orcamento.html com parâmetros (?produto=, ?perfil=, ?origem=)
-# não são bloqueadas de propósito: elas apontam canonical para /orcamento.html.
-
 User-agent: *
 Allow: /
 
-# Buscadores e assistentes de IA: acesso liberado (o objetivo é ser citado com dados corretos).
-User-agent: Googlebot
-User-agent: Bingbot
-User-agent: OAI-SearchBot
-User-agent: ChatGPT-User
-User-agent: GPTBot
-User-agent: PerplexityBot
-User-agent: ClaudeBot
-User-agent: Claude-SearchBot
-User-agent: Google-Extended
-User-agent: Applebot-Extended
-Allow: /
-
-Sitemap: https://smartpix.com.br/sitemap.xml
+Sitemap: https://ojoaofi.github.io/SmartPix-Site/sitemap.xml
