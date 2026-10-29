@@ -5,7 +5,7 @@ Site estático (HTML/CSS/JS puro, sem framework) da Smart Pix Impressão Digital
 ## Como trabalhar
 - O HTML é gerado: edite `site/build.py` (dados em `PRODUCTS`, `PROBLEMS`, `PROJECTS`, `FAQ`, `XL`, `GRID`; páginas em `page_*`) e rode `python3 site/build.py`. Nunca edite os `.html` à mão.
 - Teste servindo `site/` (`python3 -m http.server`) e confira desktop (1440px) e celular (390px): sem rolagem horizontal, alvos de toque ≥ 44px, sem erros no console.
-- Three.js r128 vem do cdnjs e só carrega quando o estúdio se aproxima da tela; sem WebGL há uma versão 2D.
+- Three.js r128 é servido pelo próprio site (`js/vendor/three.min.js`) e só carrega quando o estúdio se aproxima da tela; sem WebGL, com economia de dados ou se o 3D falhar, há uma versão 2D (só a lona).
 - `SITE_URL`, `INDEXAR` e `GTM_ID` são variáveis do build (ver README); vazias valem como não definidas. O build também gera `sitemap.xml`, `robots.txt` e `llms.txt` (fonte: `llms.src.txt`, com marcadores como `{CONTATOS}` e `{INST_*}`).
 - `CONFIRMADO` no topo do `build.py` decide o que o site pode afirmar (instalação própria, telefone fixo, Instagram). Texto novo que dependa de um desses itens passa por `inst(sim, nao)` ou pelo dicionário; sem confirmação, o padrão é "sob consulta".
 - Imagens opcionais (fotos reais recortadas, versões "antes" dos problemas) entram só se o arquivo existir em `img/`; o build lê as medidas do próprio `.webp`.

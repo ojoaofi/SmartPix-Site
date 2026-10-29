@@ -478,7 +478,7 @@ def page_projetos():
         cards += f'<article class="card rise" id="{pid}" data-id="{pid}" data-cat="{cat}"><div class="card-img">{cimg}<span class="tag">{tag}</span></div><div class="card-body"><h2 class="card-t">{title}</h2><p>{line}</p><button type="button" class="card-open" aria-haspopup="dialog">Ver o que entregamos<span class="sr"> em {title.lower()}</span></button></div><div class="card-detail" hidden>{detail}</div></article>'
     body = f'''
 <section class="phero" aria-labelledby="h-page"><div class="wrap center"><h1 id="h-page" class="page-title">Aplicações</h1><p class="page-sub">Do palco à frota: onde a impressão entra no seu projeto.</p></div></section>
-<section class="sec" aria-label="Aplicações" style="padding-top:0"><div class="wrap">
+<section class="sec" aria-label="Lista de aplicações" style="padding-top:0"><div class="wrap">
   <div class="pbar"><div class="chips" role="group" aria-label="Filtrar por tipo">{chips}</div><p class="caption" id="pcount" aria-live="polite">{len(projs)} tipos de projeto</p></div>
   <div class="pgrid" id="pgrid">{cards}</div>
   <p class="notice">Por respeito aos nossos clientes, não mostramos marcas de terceiros. As imagens marcadas como “{AI}” ilustram cada tipo de projeto; as marcadas como “{REAL}” são de trabalhos nossos.</p>
