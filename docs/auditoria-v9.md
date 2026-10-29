@@ -144,3 +144,31 @@ Sem violações no axe-core e Lighthouse 100. Dois ajustes finos:
 - Fotos reais em boa resolução, sem marca de cliente e sem precisar borrar nada (C3).
 - Prazo médio de resposta e de produção (V1); ano de fundação, números do galpão e das máquinas, link das avaliações no Google (V2).
 - Nome e e-mail da pessoa que vai aprovar os textos antes do `INDEXAR=1`.
+
+## Status depois do v10
+
+Gravidade e números de item como acima. **Aplicado** = está no site; **Pendente** = depende da Smart Pix ou de material novo.
+
+| Item | Status | Como ficou |
+|---|---|---|
+| C1 | Aplicado (aguarda confirmação) | `CONFIRMADO['instalacao_propria'] = False` no `build.py`: o site diz "montagem sob consulta", o cartão "Montagem no local" sai de Aplicações e o problema "a gráfica não instala" vira "a entrega depende de terceiros". Com `True`, os textos fortes voltam. |
+| C2 | Aplicado (aguarda confirmação) | Telefone fixo e Instagram saem do rodapé, do Orçamento, do JSON-LD e do `llms.txt` até serem confirmados (`telefone_fixo`, `instagram`). |
+| C3 | Aplicado em parte | Novo recorte do galpão sem a faixa borrada (faixa da Home, capa de Cenografia, "Quem somos") e `og.jpg` refeito. A foto borrada da impressora saiu. Fotos novas continuam pendentes. |
+| C4 | Aplicado | Faixa "Produção própria." com foto real logo depois da abertura; foto real do Smart Floor em "Quem somos" e em Aplicações; cartões de problema com versões "antes", o que reduz a repetição. |
+| C5 | Aplicado | "Projetos" virou "Aplicações" (mesma URL) e o cartão de pisos usa a foto real. |
+| C6 | Aplicado | "O prazo é confirmado no orçamento." |
+| C7 | Aplicado | Página `privacidade.html`; com `GTM_ID`, aviso de cookies e Tag Manager só depois do aceite. |
+| C8 | Aplicado | Selo na imagem de reserva do estúdio; texto do modo 2D sem "gire". |
+| D1–D7, D9–D11 | Aplicado | Home sob a barra translúcida; textos centralizados; seta dupla e seta solta corrigidas; subnav sem o botão no celular; seletor do 3D sem cobrir o estande; 320 px sem rolagem; barra a 13 px; "Como resolvemos"; `design-system/README.md` com a seção "No site". |
+| D8 | Pendente | Não há fonte maior que 1536 px; a geração no Canva funciona, mas o download em alta resolução é bloqueado neste ambiente. |
+| M1 | Aplicado | Entrada em 0,6 s, subida menor, gatilho ao entrar na tela. |
+| P1–P3, P7 | Aplicado | Sonda do WebGL só perto do estúdio; barra sem reflow forçado; three.js servido de `js/vendor/`; código morto removido. |
+| P4, P5 | Aplicado | 1º cartão de Aplicações sem lazy; WebP de 800 px recomprimidos. |
+| P6 | Não aplicado | O GitHub Pages fixa o cache; reavaliar com domínio próprio. |
+| A1, A2 | Aplicado | Nome do link da marca começa pelo texto visível; espaço no `<h1>`. |
+| S1, S2, S4 | Aplicado | 404 publicada (com endereços absolutos); variáveis do build vindas das Variables do GitHub; descrições ≤ 155 caracteres (textos da pesquisa de mercado). |
+| S3 | Documentado | No checklist de lançamento do README. |
+| S5, V1, V2 | Pendente | Google Meu Negócio, prazo de resposta, números e avaliações: dependem da Smart Pix (ver `docs/pesquisa-mercado.md`, seção 8). |
+| S6 | Não aplicado | `geo` exige coordenadas confirmadas. |
+| V3 | Aplicado em parte | "Google Maps" em "Como nos conheceu?"; a medição espera o `GTM_ID`. |
+| E1, E2 | Aplicado | `scripts/verificar_site.py` + `verificar.yml`; README atualizado. |
