@@ -1,0 +1,39 @@
+name: Verificar site
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Sem SITE_URL, INDEXAR e GTM_ID: os .html do repositório são gerados com o padrão do build.py.
+      - name: Gerar páginas
+        run: python3 site/build.py
+      - name: Conferir se os arquivos commitados batem com o build.py
+        run: |
+          if ! git diff --exit-code --stat -- site; then
+            git diff -- site | cut -c1-300 | head -80
+            echo "::error::Os arquivos de site/ não batem com o build.py. Rode 'python3 site/build.py' e faça commit do resultado."
+            exit 1
+          fi
+          novos="$(git ls-files --others --exclude-standard -- site)"
+          if [ -n "$novos" ]; then
+            echo "$novos"
+            echo "::error::O build gerou arquivos que não estão no commit. Faça commit deles."
+            exit 1
+          fi
+      - name: Verificar HTML (links, arquivos, IDs, h1, título, descrição, alt, selos, JSON-LD)
+        run: python3 scripts/verificar_site.py
+      - name: Verificar a pasta que seria publicada
+        run: |
+          bash scripts/montar_publicacao.sh _site
+          python3 scripts/verificar_site.py _site

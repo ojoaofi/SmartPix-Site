@@ -11,7 +11,7 @@ Site estático (HTML/CSS/JS puro, sem framework) da Smart Pix Impressão Digital
 - Imagens opcionais (fotos reais recortadas, versões "antes" dos problemas) entram só se o arquivo existir em `img/`; o build lê as medidas do próprio `.webp`.
 - Home e Aplicações (`projetos.html`) terminam em `cta_end()` (3 passos + orçamento + WhatsApp). Elementos com a classe `rise` entram com fade; não usar em blocos de tela cheia.
 - Com `GTM_ID`, o Tag Manager só carrega depois do aceite no aviso de cookies; a página `privacidade.html` explica o que o site faz com os dados.
-- Antes de publicar: `python3 site/build.py && python3 scripts/verificar_site.py`.
+- Antes de publicar: `python3 site/build.py && python3 scripts/verificar_site.py`. O CI (`verificar.yml`) falha se os `.html` commitados não baterem com o build sem variáveis. Pasta nova de arquivos em `site/` precisa entrar em `scripts/montar_publicacao.sh` (é a lista do que vai ao ar).
 
 ## Direção visual (aprovada pelo cliente)
 - Padrão apple.com: abre com a marca (logo + "Smart Pix"), blocos de produto em tela cheia, muito respiro, frases curtas.

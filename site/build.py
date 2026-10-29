@@ -551,8 +551,14 @@ def page_404():
 <section class="phero" aria-labelledby="h-page"><div class="wrap center"><h1 id="h-page" class="page-title">Página não encontrada.</h1><p class="page-sub">O endereço mudou ou não existe. Comece por aqui:</p>
   <div class="ctas"><a class="btn btn-fill" href="./">Ir para o início</a><a class="btn btn-line" href="orcamento.html">Pedir orçamento</a></div></div></section>'''
     h = h.replace('<meta name="robots" content="noindex, follow">', '').replace('<link rel="canonical"', '<meta name="robots" content="noindex">\n<link rel="canonical"', 1)
-    h = h.replace('<head>', f'<head>\n<base href="{SITE}">', 1)  # 404 can be served at any depth
-    return h + body + foot()
+    # 404 can be served at any depth: relative paths become absolute (a <base> would also redirect #anchors to the home)
+    import re
+    def absolute(m):
+        attr, val = m.group(1), m.group(2)
+        if attr == 'srcset': val = ', '.join(SITE + c.strip() for c in val.split(','))
+        elif not re.match(r'(https?:|mailto:|tel:|#|/|data:)', val): val = SITE + ('' if val == './' else val.removeprefix('./'))
+        return f'{attr}="{val}"'
+    return re.sub(r'\b(href|src|srcset|imagesrcset)="([^"]*)"', absolute, h + body + foot())
 
 def page_privacidade():
     h = head('Privacidade | Smart Pix', 'Como o site da Smart Pix trata os seus dados: o pedido de orçamento sai pelo seu WhatsApp ou e-mail, e você decide o que enviar.', 'privacidade.html', crumbs('privacidade.html', 'Privacidade'), 'privacidade') + nav('')

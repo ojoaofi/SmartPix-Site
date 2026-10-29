@@ -3,8 +3,8 @@ name: Publicar site no GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ["site/**", ".github/workflows/pages.yml"]
-  workflow_dispatch:
+    paths: ["site/**", "scripts/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:  # rode à mão (Actions → Publicar site → Run workflow) depois de mudar uma Variable
 
 permissions:
   contents: read
@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false  # não interrompe uma publicação no meio; a próxima espera na fila
 
 jobs:
   deploy:
@@ -21,6 +21,12 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    # Variables do repositório: Settings → Secrets and variables → Actions → Variables.
+    # Variable vazia ou inexistente = não definida: o build usa o padrão (github.io, noindex, sem GTM).
+    env:
+      SITE_URL: ${{ vars.SITE_URL }}
+      INDEXAR: ${{ vars.INDEXAR }}
+      GTM_ID: ${{ vars.GTM_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,10 +35,9 @@ jobs:
       - name: Gerar páginas
         run: python3 site/build.py
       - name: Preparar pasta publicada
-        run: |
-          mkdir -p _site
-          cp -r site/index.html site/solucoes.html site/cenografia.html site/projetos.html site/orcamento.html site/css site/js site/img site/fonts site/robots.txt site/sitemap.xml site/llms.txt _site/
-          touch _site/.nojekyll
+        run: bash scripts/montar_publicacao.sh _site
+      - name: Verificar pasta publicada
+        run: python3 scripts/verificar_site.py _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
