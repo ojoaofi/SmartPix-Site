@@ -246,27 +246,28 @@ FAQ = [
 ]
 
 # ------------------------------------------------------------------ pages
-XL = [  # id, title, line, img, quote value, alt, theme
- ('lona', 'Lona sem emenda', 'Até 5 metros. Uma peça só.', 'ai-printer', 'Lona / backdrop', 'Ilustração gerada por IA: impressora de grande formato imprimindo uma lona inteira, que se estende pelo chão do galpão', 'light'),
- ('smart-floor', 'Smart Floor', 'Piso impresso. O chão também comunica.', 'ai-floor', 'Smart Floor', 'Ilustração gerada por IA: faixa de piso vinílico impresso em verde-limão e grafite no corredor de uma feira', 'light'),
+BENTO = [  # id, title, line, img, href, quote value, size, theme, dimension (só medida confirmada)
+ ('lona', 'Lona sem emenda', 'Até 5 metros de largura, numa peça só.', 'ai-printer', 'solucoes.html#lona', 'Lona / backdrop', 'b-lg', 'light', '5,00 m'),
+ ('smart-floor', 'Smart Floor', 'Piso impresso. O chão também comunica.', 'ai-floor', 'solucoes.html#smart-floor', 'Smart Floor', 'b-tall', 'dark', ''),
+ ('cenografia', 'Cenografia e estandes', 'O cenário inteiro, num pedido só.', 'ai-booth', 'solucoes.html#cenografia', 'Estande completo', 'b-md', 'light', ''),
+ ('letras-caixa', 'Letras-caixa e fachadas', 'A marca em três dimensões.', 'ai-facade', 'solucoes.html#letras-caixa', 'Letra-caixa / fachada', 'b-md', 'dark', ''),
+ ('frota', 'Envelopamento de frota', 'A marca que roda a cidade.', 'ai-van', 'solucoes.html#frota', 'Envelopamento de frota', 'b-md', 'light', ''),
+ ('vitrines', 'Vitrines e PDV', 'A mesma campanha em todas as lojas.', 'ai-vitrine', 'solucoes.html#vitrines', 'Vitrine / adesivo', 'b-half', 'light', ''),
+ ('impressao-3d', 'Impressão 3D', 'Formas que a impressão plana não faz.', 'ai-print3d', 'solucoes.html#impressao-3d', 'Impressão 3D', 'b-half', 'light', ''),
 ]
-GRID = [  # id, title, line, img, href, quote value, theme
- ('cenografia', 'Cenografia e estandes', 'O cenário inteiro, num pedido só.', 'ai-booth', 'solucoes.html#cenografia', 'Estande completo', 'light'),
- ('letras-caixa', 'Letras-caixa e fachadas', 'A marca em três dimensões.', 'ai-facade', 'solucoes.html#letras-caixa', 'Letra-caixa / fachada', 'dark'),
- ('frota', 'Envelopamento de frota', 'A marca que roda a cidade.', 'ai-van', 'solucoes.html#frota', 'Envelopamento de frota', 'light'),
- ('vitrines', 'Vitrines e PDV', 'A mesma campanha em todas as lojas.', 'ai-vitrine', 'solucoes.html#vitrines', 'Vitrine / adesivo', 'light'),
- ('impressao-3d', 'Impressão 3D', 'Formas que a impressão plana não faz.', 'ai-print3d', 'solucoes.html#impressao-3d', 'Impressão 3D', 'light'),
- ('parceiros', 'Para cenografia e agências', 'Você atende o cliente. A gente produz.', 'ai-whitelabel', 'cenografia.html', 'Estande completo', 'light'),
-]
+def dim(label):
+    """Cota de medida, como num desenho técnico: a largura real da peça."""
+    return f'<div class="dim" aria-hidden="true"><i></i><span>{label}</span><i></i></div>' if label else ''
+
 def cta_end(key, title='Qual é o seu próximo projeto?', perfil=''):
     href = 'orcamento.html' + (f'?perfil={perfil}' if perfil else '')
     return f'''
-<section class="sec gray cta-end" aria-labelledby="h-cta">
-  <div class="wrap center"><h2 id="h-cta" class="h1">{title}</h2><p class="lead">Conte o que precisa. A mensagem chega pronta no nosso WhatsApp.</p>
+<section class="sec dark cta-end" aria-labelledby="h-cta">
+  <div class="wrap"><h2 id="h-cta" class="cta-title">{title}</h2><p class="lead">Conte o que precisa. A mensagem chega pronta no nosso WhatsApp.</p>
     <ol class="how">
-      <li class="rise"><span class="n">1</span><b>Conte o projeto</b><span>Perfil, peças e data. Leva menos de um minuto.</span></li>
-      <li class="rise"><span class="n">2</span><b>Receba o orçamento</b><span>Pelo WhatsApp ou por e-mail, de segunda a sexta, das 8h às 18h.</span></li>
-      <li class="rise"><span class="n">3</span><b>{inst('A gente produz e instala', 'A gente produz e entrega')}</b><span>Impressão em Atibaia, entrega com frota própria.</span></li>
+      <li><span class="n">1</span><b>Conte o projeto</b><span>Perfil, peças e data. Leva menos de um minuto.</span></li>
+      <li><span class="n">2</span><b>Receba o orçamento</b><span>Pelo WhatsApp ou por e-mail, de segunda a sexta, das 8h às 18h.</span></li>
+      <li><span class="n">3</span><b>{inst('A gente produz e instala', 'A gente produz e entrega')}</b><span>Impressão em Atibaia, entrega com frota própria.</span></li>
     </ol>
     <div class="ctas"><a class="btn btn-fill" href="{href}" data-cta="{key}">Pedir orçamento</a><a class="btn btn-line" href="https://wa.me/{WA_NUM}" data-wa="Olá, Smart Pix! Vim pelo site e quero falar sobre um projeto." data-cta="{key}-wa">Falar no WhatsApp</a></div>
   </div>
@@ -299,44 +300,64 @@ def page_home():
     {btns(('orcamento.html', 'Pedir orçamento'), ('solucoes.html', 'Ver soluções'), 'hero')}
     <p class="hero-link"><a class="link" href="cenografia.html" data-cta="hero-partner">É de cenografia ou agência? Conheça a parceria</a></p>
   </div>
-  <figure class="hero-img">{pic('ai-stage', 'Ilustração gerada por IA: palco de evento com um painel de lona de 5 metros, sem emenda, em verde-limão, branco e grafite', lazy=False, sizes='100vw')}<figcaption class="tag">{AI}</figcaption></figure>
-  <ul class="wrap hl" aria-label="Destaques">
-    <li><b>5 m</b><span>de largura sem emenda</span></li>
-    <li><b>UV LED</b><span>tinta curada na hora</span></li>
-    <li><b>Frota própria</b><span>{inst('entrega e instalação', 'entrega no local')}</span></li>
-    <li><b>Atibaia, SP</b><span>produção própria</span></li>
+</section>'''
+    # O momento da página: a lona se abre com a rolagem até 5 m, com a cota acompanhando a largura.
+    unroll = f'''
+<section class="unroll dark" data-unroll aria-labelledby="h-unroll">
+  <div class="unroll-pin">
+    <div class="unroll-dim" aria-hidden="true"><i></i><span class="unroll-num">5,00 m</span><i></i></div>
+    <figure class="unroll-frame">{pic('ai-stage', 'Ilustração gerada por IA: palco de evento com um painel de lona de 5 metros, sem emenda, em verde-limão, branco e grafite', lazy=False, sizes='100vw')}<figcaption class="tag">{AI}</figcaption></figure>
+    <h2 id="h-unroll" class="unroll-title">Até 5 metros de largura. <span>Uma peça só, sem emenda.</span></h2>
+  </div>
+</section>
+<section class="dark hl-sec" aria-label="Destaques">
+  <ul class="wrap hl">
+    <li><b>UV LED</b><span>Tinta curada na hora, na nossa produção.</span></li>
+    <li><b>Frota própria</b><span>{inst('Entrega e instalação no local.', 'Entrega no local do evento.')}</span></li>
+    <li><b>Um pedido só</b><span>Lona, tecido, piso, ACM, PVC, adesivo e 3D.</span></li>
+    <li><b>Atibaia, SP</b><span>Produção própria, perto de São Paulo.</span></li>
   </ul>
 </section>'''
     # Prova real logo depois da abertura: o galpão de verdade, antes das ilustrações.
     real = '' if 'real-galpao' not in IMGS else f'''
-<section class="tile tile-xl dark real-band" id="t-producao" aria-labelledby="h-t-producao">
-  <div class="tile-copy"><h2 id="h-t-producao" class="tile-title">Produção própria.</h2><p class="tile-sub">Nosso galpão em Atibaia, perto de São Paulo.</p>{btns(('orcamento.html', 'Pedir orçamento'), ('#quem-somos', 'Como trabalhamos'), 'tile-producao')}</div>
-  <div class="tile-img">{pic('real-galpao', 'Galpão de produção da Smart Pix em Atibaia, com impressoras de grande formato à esquerda e o corredor de produção ao fundo', sizes='100vw')}</div><span class="tag">{REAL} · galpão em Atibaia</span>
+<section class="feature real-band" id="t-producao" aria-labelledby="h-t-producao">
+  <div class="feature-img">{pic('real-galpao', 'Galpão de produção da Smart Pix em Atibaia, com impressoras de grande formato à esquerda e o corredor de produção ao fundo', sizes='100vw')}</div>
+  <div class="wrap feature-copy"><h2 id="h-t-producao" class="feature-title">Produção própria.</h2><p class="feature-sub">Nosso galpão em Atibaia, perto de São Paulo.</p>{btns(('orcamento.html', 'Pedir orçamento'), ('#quem-somos', 'Como trabalhamos'), 'tile-producao')}</div>
+  <span class="tag">{REAL} · galpão em Atibaia</span>
 </section>'''
-    xl = ''.join(f'''
-<section class="tile tile-xl {t}" id="t-{i}" aria-labelledby="h-t-{i}">
-  <div class="tile-copy"><h2 id="h-t-{i}" class="tile-title">{a}</h2><p class="tile-sub">{b}</p>{btns((q(v), 'Orçar'), ('solucoes.html#' + i, 'Saiba mais'), 'tile-' + i)}</div>
-  <div class="tile-img">{pic(im, alt, sizes='100vw')}</div><span class="tag">{AI}</span>
-</section>''' for i, a, b, im, v, alt, t in XL)
-    grid = ''.join(f'''<div class="tile {t}" role="group" aria-labelledby="h-g-{i}">
-    <div class="tile-copy"><h2 id="h-g-{i}" class="tile-title">{a}</h2><p class="tile-sub">{b}</p>{btns(((q(v) if i != 'parceiros' else 'orcamento.html?perfil=Cenografia%20%2F%20montadora'), 'Orçar'), (href, 'Saiba mais'), 'grid-' + i)}</div>
-    <div class="tile-img">{pic(im, '', sizes='(max-width:734px) 100vw, 50vw')}</div><span class="tag">{AI}</span>
-  </div>''' for i, a, b, im, href, v, t in GRID)
-    tiles = f'<section class="tiles" aria-label="Soluções">{grid}</section>'
+    tiles_html = ''.join(f'''
+    <article class="bt {size} {theme}" aria-labelledby="h-b-{i}">
+      <div class="bt-img">{pic(im, '', sizes='(max-width:734px) 100vw, (max-width:1068px) 50vw, 52rem' if size == 'b-lg' else '(max-width:734px) 100vw, 40rem')}</div>
+      <div class="bt-copy"><h3 id="h-b-{i}" class="bt-title">{a}</h3><p class="bt-sub">{b}</p>
+        <p class="bt-act"><a class="btn btn-fill btn-sm" href="{q(v)}" data-cta="bento-{i}">Orçar</a><a class="link" href="{href}" data-cta="bento-{i}-more">Saiba mais</a></p></div>
+      {dim(d)}<span class="tag">{AI}</span>
+    </article>''' for i, a, b, im, href, v, size, theme, d in BENTO)
+    bento = f'''
+<section class="sec bento-sec" aria-labelledby="h-bento">
+  <div class="wrap wide"><h2 id="h-bento" class="h1 bento-h">Do palco à frota.</h2><p class="lead bento-lead">Cada peça no material certo, impressa na mesma produção.</p>
+    <div class="bento">{tiles_html}
+    </div>
+  </div>
+</section>
+<section class="feature partner dark" aria-labelledby="h-partner">
+  <div class="feature-img">{pic('ai-whitelabel', 'Ilustração gerada por IA: rolos de lona embalados em papel kraft, sem identificação, ao lado de uma van branca', sizes='(max-width:734px) 100vw, 60vw')}</div>
+  <div class="wrap feature-copy"><h2 id="h-partner" class="feature-title">Você atende o cliente.<br>A gente produz.</h2><p class="feature-sub">Parceiro de produção para cenografia, montadoras, agências e produtoras.</p>{btns(('orcamento.html?perfil=Cenografia%20%2F%20montadora', 'Orçar como parceiro'), ('cenografia.html', 'Como funciona'), 'partner')}</div>
+  <span class="tag">{AI}</span>
+</section>'''
     who = f'''
 <section class="sec" id="para-quem" aria-labelledby="h-who">
   <div class="wrap">
-    <div class="sec-head center rise">{kicker('para quem')}<h2 id="h-who" class="h1">Feito para quem produz.</h2></div>
-    <div class="who">
-      <a class="who-i rise" href="cenografia.html" data-cta="who-ceno"><h3>Cenografia e montadoras</h3><p>Sua equipe projeta e monta. A gente produz toda a parte gráfica num pedido só e entrega no pavilhão.</p><span class="more">Como trabalhamos juntos</span></a>
-      <a class="who-i rise" href="cenografia.html#agencias" data-cta="who-ag"><h3>Agências e produtoras</h3><p>Produção terceirizada para os seus clientes: a gente produz, você entrega o projeto.</p><span class="more">Produzir com a gente</span></a>
-      <a class="who-i rise" href="orcamento.html?perfil=Empresa" data-cta="who-emp"><h3>Empresas</h3><p>Eventos, lojas, fachada e frota com um fornecedor só, do arquivo à {inst('instalação', 'entrega')}.</p><span class="more">Pedir orçamento</span></a>
-    </div>
+    <h2 id="h-who" class="h1 who-h">Feito para quem produz.</h2>
+    <ul class="who-list">
+      <li><a href="cenografia.html" data-cta="who-ceno"><span class="who-t">Cenografia e montadoras</span><span class="who-d">Sua equipe projeta e monta. A gente produz toda a parte gráfica num pedido só e entrega no pavilhão.</span><span class="who-go" aria-hidden="true"></span></a></li>
+      <li><a href="cenografia.html#agencias" data-cta="who-ag"><span class="who-t">Agências e produtoras</span><span class="who-d">Produção terceirizada para os seus clientes: a gente produz, você entrega o projeto.</span><span class="who-go" aria-hidden="true"></span></a></li>
+      <li><a href="orcamento.html?perfil=Empresa" data-cta="who-emp"><span class="who-t">Empresas</span><span class="who-d">Eventos, lojas, fachada e frota com um fornecedor só, do arquivo à {inst('instalação', 'entrega')}.</span><span class="who-go" aria-hidden="true"></span></a></li>
+    </ul>
   </div>
 </section>'''
     studio = f'''
 <section class="sec dark studio-sec" id="estudio" aria-labelledby="h-studio">
-  <div class="wrap sec-head center rise">{kicker('estúdio 3D')}<h2 id="h-studio" class="h1">Veja a sua marca num estande.</h2><p class="lead">Digite o nome, escolha a cor e gire. Depois, é só orçar.</p></div>
+  <div class="wrap sec-head center"><h2 id="h-studio" class="h1">Veja a sua marca num estande.</h2><p class="lead">Digite o nome, escolha a cor e gire. Depois, é só orçar.</p></div>
   <div class="studio" id="studio">
     <div class="studio-stage" role="group" aria-label="Visualizador 3D do estande">
       <div class="studio-3d" role="img" aria-label="Estande com a sua marca: lona de 5 por 3 metros, piso Smart Floor, balcão, totem e letra-caixa.">{pic('ai-booth', '', cls='fallback')}<span class="tag studio-tag" aria-hidden="true">{AI}</span><canvas id="studioCanvas" aria-hidden="true"></canvas></div>
@@ -360,13 +381,13 @@ def page_home():
     about = f'''
 <section class="sec" id="quem-somos" aria-labelledby="h-about">
   <div class="wrap">
-    <div class="sec-head center rise">{kicker('quem somos')}<h2 id="h-about" class="h1">Do arquivo ao palco.</h2><p class="lead">{inst('A Smart Pix planeja, imprime, produz e instala. Com equipe e frota próprias, a partir do nosso galpão em Atibaia.', 'A Smart Pix planeja, imprime, produz e entrega com frota própria, a partir do nosso galpão em Atibaia.')}</p></div>
+    <div class="about-head"><h2 id="h-about" class="h1">Do arquivo ao palco.</h2><p class="lead">{inst('A Smart Pix planeja, imprime, produz e instala. Com equipe e frota próprias, a partir do nosso galpão em Atibaia.', 'A Smart Pix planeja, imprime, produz e entrega com frota própria, a partir do nosso galpão em Atibaia.')}</p></div>
     <div class="photo-duo{' one' if len(duo) == 1 else ''}">{photos}</div>
-    <ol class="steps">
-      <li class="rise"><span class="n">01</span><h3>Planejamento</h3><p>Você manda a ideia, as medidas e a data. A gente indica o material de cada peça.</p></li>
-      <li class="rise"><span class="n">02</span><h3>Impressão UV LED</h3><p>Grande formato, até 5 m sem emenda, na nossa produção.</p></li>
-      <li class="rise"><span class="n">03</span><h3>Acabamento</h3><p>Corte, montagem das peças e impressão 3D quando o projeto pede.</p></li>
-      <li class="rise"><span class="n">04</span><h3>{inst('Entrega e instalação', 'Entrega')}</h3><p>{inst('Frota e equipe próprias levam e montam no local.', 'A frota própria leva até o local. Montagem sob consulta.')}</p></li>
+    <ol class="steps timeline">
+      <li><span class="n">1</span><h3>Planejamento</h3><p>Você manda a ideia, as medidas e a data. A gente indica o material de cada peça.</p></li>
+      <li><span class="n">2</span><h3>Impressão UV LED</h3><p>Grande formato, até 5 m sem emenda, na nossa produção.</p></li>
+      <li><span class="n">3</span><h3>Acabamento</h3><p>Corte, montagem das peças e impressão 3D quando o projeto pede.</p></li>
+      <li><span class="n">4</span><h3>{inst('Entrega e instalação', 'Entrega')}</h3><p>{inst('Frota e equipe próprias levam e montam no local.', 'A frota própria leva até o local. Montagem sob consulta.')}</p></li>
     </ol>
   </div>
 </section>'''
@@ -388,17 +409,20 @@ def page_home():
 </article>'''
     problemas = f'''
 <section class="sec gray" id="problemas" aria-labelledby="h-px" data-rail>
-  <div class="wrap px-head rise">{kicker('problemas que resolvemos')}<h2 id="h-px" class="h1">Já passou por isso?</h2><p class="lead">Toque no + para ver como a Smart Pix resolve.</p></div>
+  <div class="wrap px-head"><h2 id="h-px" class="h1">Já passou por isso?</h2><p class="lead">Toque no + para ver como a Smart Pix resolve.</p></div>
   <div class="rail" tabindex="0" role="region" aria-label="Problemas que resolvemos">{cards}</div>
   <div class="wrap rail-nav"><button type="button" data-dir="-1" aria-label="Problema anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button type="button" data-dir="1" aria-label="Próximo problema"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
 </section>'''
     faq = ''.join(f'<details><summary>{qq}<i aria-hidden="true"></i></summary><p>{a}</p></details>' for qq, a in FAQ)
     end = f'''
 <section class="sec" id="duvidas" aria-labelledby="h-faq">
-  <div class="wrap narrow"><div class="sec-head center rise">{kicker('dúvidas')}<h2 id="h-faq" class="h1">Antes de pedir.</h2></div><div class="faq">{faq}</div></div>
+  <div class="wrap faq-wrap">
+    <div class="faq-aside"><h2 id="h-faq" class="h1">Antes de pedir.</h2><p class="lead">As perguntas que mais chegam pelo WhatsApp.</p><p><a class="link" href="https://wa.me/{WA_NUM}" data-wa="Olá, Smart Pix! Vim pelo site e tenho uma dúvida." data-cta="faq-wa">Perguntar outra coisa</a></p></div>
+    <div class="faq">{faq}</div>
+  </div>
 </section>
 {cta_end('final')}'''
-    return h + hero + real + xl + tiles + who + studio + about + problemas + end + foot(('studio.js', 'problems.js'))
+    return h + hero + unroll + real + bento + who + studio + about + problemas + end + foot(('studio.js', 'problems.js'))
 
 PAIRS = {'lona': ['smart-floor', 'cenografia'], 'smart-floor': ['lona', 'cenografia'], 'cenografia': ['lona', 'impressao-3d'], 'letras-caixa': ['vitrines', 'frota'],
          'vitrines': ['letras-caixa', 'materiais'], 'frota': ['letras-caixa', 'vitrines'], 'impressao-3d': ['cenografia', 'letras-caixa'], 'materiais': ['lona', 'smart-floor']}
@@ -419,7 +443,7 @@ def page_solucoes():
   <div class="wrap">
     <div class="sec-head center rise">{kicker(name)}<h2 id="h-{pid}" class="h1">{title}</h2><p class="lead">{lead}</p>
       <div class="ctas"><a class="btn btn-fill" href="{q(val)}" data-cta="sol-{pid}">{cta}</a><a class="btn btn-line" href="https://wa.me/{WA_NUM}" data-wa="Olá, Smart Pix! Quero saber mais sobre {wtxt}." data-cta="sol-wa-{pid}">Tirar dúvida</a></div></div>
-    <figure class="prod-img">{pic(im, 'Ilustração gerada por IA: ' + name, sizes='(max-width:1068px) 100vw, 67rem')}<figcaption class="tag">{AI}</figcaption></figure>
+    <figure class="prod-img">{pic(im, 'Ilustração gerada por IA: ' + name, sizes='(max-width:1068px) 100vw, 67rem')}{dim('5,00 m') if pid == 'lona' else ''}<figcaption class="tag">{AI}</figcaption></figure>
     <ul class="specs">{lis}</ul>
     <p class="pairs"><span>Combina com</span>{pairs(pid)}</p>
   </div>

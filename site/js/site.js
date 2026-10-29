@@ -147,6 +147,23 @@
     D.querySelectorAll('.steps li').forEach(function (li, i) { li.style.transitionDelay = (i * 0.12) + 's'; stepIO.observe(li); });
   }
 
+  /* ---------- Unroll: the 5 m lona opens 1:1 with the scroll; the dimension line follows the visible width ---------- */
+  D.querySelectorAll('[data-unroll]').forEach(function (ur) {
+    var num = ur.querySelector('.unroll-num'), top = 0, len = 1, raf = 0, last = -1;
+    function paint(p) {
+      p = Math.max(0, Math.min(1, p)); var e = 1 - Math.pow(1 - p, 2), w = 0.24 + 0.76 * e;
+      if (Math.abs(e - last) < 0.0005) return; last = e;
+      ur.style.setProperty('--p', e.toFixed(4));
+      if (num) num.textContent = (5 * w).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' m';
+    }
+    if (reduce) { paint(1); return; }
+    ur.classList.add('on');
+    function measure() { var r = ur.getBoundingClientRect(); top = r.top + scrollY - (nav ? nav.offsetHeight : 0); len = Math.max(1, ur.offsetHeight - innerHeight * 0.85); onScroll(); }
+    function onScroll() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; paint((scrollY - top) / len); }); }
+    addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', measure); addEventListener('load', measure);
+    afterLayout(measure);
+  });
+
   /* ---------- Rails: touch uses native scrolling; mouse gets 1:1 drag, momentum projected to the nearest card, spring settle ---------- */
   D.querySelectorAll('[data-rail]').forEach(function (wrap) {
     var rail = wrap.querySelector('.rail'); if (!rail) return;
