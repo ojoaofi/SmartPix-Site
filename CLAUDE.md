@@ -6,8 +6,12 @@ Site estático (HTML/CSS/JS puro, sem framework) da Smart Pix Impressão Digital
 - O HTML é gerado: edite `site/build.py` (dados em `PRODUCTS`, `PROBLEMS`, `PROJECTS`, `FAQ`, `XL`, `GRID`; páginas em `page_*`) e rode `python3 site/build.py`. Nunca edite os `.html` à mão.
 - Teste servindo `site/` (`python3 -m http.server`) e confira desktop (1440px) e celular (390px): sem rolagem horizontal, alvos de toque ≥ 44px, sem erros no console.
 - Three.js r128 vem do cdnjs e só carrega quando o estúdio se aproxima da tela; sem WebGL há uma versão 2D.
-- `SITE_URL`, `INDEXAR` e `GTM_ID` são variáveis do build (ver README). O build também gera `sitemap.xml`, `robots.txt` e `llms.txt` (fonte: `llms.src.txt`).
-- Home e Projetos terminam em `cta_end()` (3 passos + orçamento + WhatsApp). Elementos com a classe `rise` entram com fade; não usar em blocos de tela cheia.
+- `SITE_URL`, `INDEXAR` e `GTM_ID` são variáveis do build (ver README); vazias valem como não definidas. O build também gera `sitemap.xml`, `robots.txt` e `llms.txt` (fonte: `llms.src.txt`, com marcadores como `{CONTATOS}` e `{INST_*}`).
+- `CONFIRMADO` no topo do `build.py` decide o que o site pode afirmar (instalação própria, telefone fixo, Instagram). Texto novo que dependa de um desses itens passa por `inst(sim, nao)` ou pelo dicionário; sem confirmação, o padrão é "sob consulta".
+- Imagens opcionais (fotos reais recortadas, versões "antes" dos problemas) entram só se o arquivo existir em `img/`; o build lê as medidas do próprio `.webp`.
+- Home e Aplicações (`projetos.html`) terminam em `cta_end()` (3 passos + orçamento + WhatsApp). Elementos com a classe `rise` entram com fade; não usar em blocos de tela cheia.
+- Com `GTM_ID`, o Tag Manager só carrega depois do aceite no aviso de cookies; a página `privacidade.html` explica o que o site faz com os dados.
+- Antes de publicar: `python3 site/build.py && python3 scripts/verificar_site.py`.
 
 ## Direção visual (aprovada pelo cliente)
 - Padrão apple.com: abre com a marca (logo + "Smart Pix"), blocos de produto em tela cheia, muito respiro, frases curtas.

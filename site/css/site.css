@@ -51,7 +51,7 @@ p{margin:0}
 .gray{background:var(--gray)}
 .sec{padding-block:var(--s9)}
 .sec-head{margin-bottom:var(--s8)}
-.sec-head.center .lead{margin-inline:auto}
+.sec-head.center .lead,.center .lead{margin-inline:auto}
 
 /* ---------- type ---------- */
 .kicker{margin:0 0 .5rem;font-size:1.3125rem;line-height:1.19;font-weight:600;letter-spacing:.011em;color:var(--ink-2)}
@@ -93,7 +93,7 @@ p{margin:0}
 .wm{font:600 1.0625rem/1 var(--brand);letter-spacing:-.03em;opacity:.8}
 .wm b{font-weight:700;opacity:1}
 .nav-links{display:flex;gap:.25rem;list-style:none;margin:0;padding:0}
-.nav-links a{display:flex;align-items:center;min-height:2.75rem;padding:0 .625rem;font-size:.75rem;letter-spacing:-.01em;text-decoration:none;opacity:.8;white-space:nowrap;transition:opacity .2s}
+.nav-links a{display:flex;align-items:center;min-height:2.75rem;padding:0 .625rem;font-size:.8125rem;letter-spacing:-.01em;text-decoration:none;opacity:.8;white-space:nowrap;transition:opacity .2s}
 .nav-links a:hover,.nav-links a[aria-current=page]{opacity:1}
 .nav-act{display:flex;align-items:center;gap:.25rem;flex:none}
 .nav-wa{display:grid;place-items:center;width:2.75rem;height:2.75rem;color:inherit;opacity:.8;transition:opacity .2s}
@@ -119,7 +119,7 @@ p{margin:0}
 .sheet-wa svg{width:1rem;height:1rem}
 
 /* ---------- home hero: the company, first ---------- */
-.hero{position:relative;overflow:hidden;padding-top:clamp(3.5rem,7vw,5.5rem);text-align:center}
+.hero{position:relative;overflow:hidden;margin-top:calc(-1 * (var(--nav) + env(safe-area-inset-top,0px)));padding-top:calc(clamp(3.5rem,7vw,5.5rem) + var(--nav) + env(safe-area-inset-top,0px));text-align:center}
 .hero-mark{width:clamp(4rem,7vw,5.5rem);height:auto;aspect-ratio:1;margin:0 auto 1.25rem}
 .hero h1 span{display:block}
 .hero-title{font-size:clamp(3.5rem,10vw,7.5rem);line-height:1;letter-spacing:-.045em;font-weight:700}
@@ -212,6 +212,8 @@ p{margin:0}
 .photo img{width:100%;height:100%;object-fit:cover}
 .photo-duo{display:grid;grid-template-columns:1.35fr 1fr;gap:1rem}
 .photo-duo .photo{height:clamp(15rem,30vw,24rem)}
+.photo-duo.one{grid-template-columns:1fr}
+.photo-duo.one .photo{height:clamp(16rem,40vw,30rem)}
 @media (max-width:734px){.photo-duo{grid-template-columns:1fr}}
 .steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2rem;list-style:none;margin:var(--s8) 0 0;padding:0}
 .steps .n{display:block;margin-bottom:.75rem;font-size:.875rem;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
@@ -432,8 +434,8 @@ body[data-page=orcamento] .nav-cta{display:none}
 @media (max-width:734px){.foot-cols{grid-template-columns:1fr 1fr}.foot-cols a{min-height:2.75rem}}
 
 /* ---------- entry motion ---------- */
-.rise{transition:transform 1s var(--ease),opacity 1s var(--ease)}
-.rise.below{transform:translateY(1.5rem);opacity:0}
+.rise{transition:transform .6s cubic-bezier(.22,.61,.36,1),opacity .5s cubic-bezier(.22,.61,.36,1)}
+.rise.below{transform:translateY(.75rem);opacity:0}
 
 /* ---------- touch: no sticky hover ---------- */
 @media (hover:none){
@@ -485,7 +487,7 @@ body[data-page=orcamento] .nav-cta{display:none}
 .subnav-in{display:flex;align-items:center;gap:1rem}
 .subnav-in ul{flex:1;min-width:0}
 .subnav-cta{flex:none}
-@media (max-width:734px){.subnav-cta{display:none}}
+@media (max-width:734px){.subnav-cta,.subnav a.subnav-cta{display:none}}
 .pairs{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .75rem;margin-top:var(--s5);font-size:.9375rem}
 .pairs span{color:var(--ink-2)}
 .pairs a{display:inline-flex;align-items:center;min-height:2.75rem;color:var(--ink);text-decoration:none}
@@ -502,6 +504,35 @@ body[data-page=orcamento] .nav-cta{display:none}
 }
 @media (prefers-reduced-transparency:reduce){.q-sticky{background:#fafafc}}
 .hero-link{margin-top:1rem}
-.hero-link .link{color:#2997ff;font-size:1.0625rem}
+.hero-link .link{display:inline-block;min-height:0;padding:.6875rem 0;color:#2997ff;font-size:1.0625rem;text-wrap:balance}
 .hero-link .link:hover{text-decoration:underline}
 .subnav a.subnav-cta{color:#000;background:var(--lime);padding:0 1rem}.subnav a.subnav-cta:hover{background:var(--lime-hi);color:#000}
+
+/* ---------- v10 ---------- */
+/* tiny phones: the bar keeps brand, primary action and menu (WhatsApp stays in the menu) */
+@media (max-width:360px){.nav-wa{display:none}.nav-in{gap:.5rem}}
+/* real photo band right after the opening */
+.real-band{margin-top:.75rem}
+.real-band .tile-img img{object-position:50% 55%}
+.real-band::before{background:linear-gradient(#000 0%,rgba(0,0,0,.66) 24%,rgba(0,0,0,0) 56%)}
+/* problem cards: the front shows the problem ("antes"), the + crossfades to the solution */
+.pc.ba .pc-img img{position:absolute;inset:0}
+.pc.ba .pc-before{filter:brightness(.66) saturate(.92)}
+.pc.ba .pc-after{opacity:0;transition:opacity .6s var(--ease),filter .7s var(--ease),transform .9s var(--ease)}
+.pc.ba.open .pc-after{opacity:1}
+.pc.ba.open .pc-before{transform:scale(1)}
+/* studio: the still image before the 3D arrives is an illustration too */
+.studio-tag{left:50%;bottom:1rem;transform:translateX(-50%);transition:opacity .4s}
+.studio.gl .studio-tag,.studio.flat .studio-tag{opacity:0}
+/* privacy */
+.prose h2{margin:2.75rem 0 .75rem}
+.prose h2:first-child{margin-top:0}
+.prose p{margin-top:.75rem;color:var(--ink-2)}
+.prose a{color:var(--ink);text-decoration:underline}
+.foot-legal a{color:inherit}
+.foot-legal a:hover{color:var(--ink)}
+/* cookie notice (only when Tag Manager is configured) */
+.consent{position:fixed;left:.75rem;right:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0px));z-index:70;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem 1rem;max-width:40rem;margin-inline:auto;padding:1rem 1.25rem;border-radius:var(--r2);background:rgba(250,250,252,.9);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 0 0 1px rgba(0,0,0,.06),0 20px 50px -20px rgba(0,0,0,.35);font-size:.875rem;color:var(--ink-2)}
+.consent a{color:var(--ink);text-decoration:underline}
+.consent-b{display:flex;gap:.5rem}
+@media (prefers-reduced-transparency:reduce){.consent{background:#fafafc}}
