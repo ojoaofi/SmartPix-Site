@@ -172,3 +172,16 @@ Gravidade e números de item como acima. **Aplicado** = está no site; **Pendent
 | S6 | Não aplicado | `geo` exige coordenadas confirmadas. |
 | V3 | Aplicado em parte | "Google Maps" em "Como nos conheceu?"; a medição espera o `GTM_ID`. |
 | E1, E2 | Aplicado | `scripts/verificar_site.py` + `verificar.yml`; README atualizado. |
+
+**Defeitos nas ilustrações IA, para quando houver como gerar de novo em alta resolução** (avaliação do v10, coordenadas na versão de 1536 px):
+- `ai-floor`: perto da câmera, à direita, o piso parece descolar, o que sugere instalação malfeita (x≈1400–1536, y≈650–863). É a prioridade, porque a imagem é do Smart Floor.
+- `ai-printer`: a ponta da lona no chão afina até virar um bico.
+- `ai-facade`: a sinalização se repete nas duas fachadas e pode ser lida como as letras "O/A".
+- `ai-print3d`: alça solta fora da porta e mesas sobrepostas.
+- `ai-van`: linha dupla na porta.
+- `ai-booth`: pernas de cadeira emaranhadas.
+- `ai-materials`: objeto amassado sem forma.
+- `ai-install`: pseudotexto nas etiquetas.
+- `ai-stage`: cadeiras do fundo fundidas.
+- `ai-whitelabel`: rolos irregulares e mais compridos que o carrinho.
+- `ai-vitrine`: sem defeito relevante.

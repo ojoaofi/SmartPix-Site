@@ -84,3 +84,6 @@ O `build.py` tem o dicionário `CONFIRMADO = {'instalacao_propria': False, 'tele
 - Ano de fundação (confere no cartão CNPJ) e números do galpão e das máquinas (área, quantidade, largura máxima por material).
 - Link das avaliações no Google (depende do perfil no Google Meu Negócio).
 - Nome e e-mail de quem aprova os textos antes do `INDEXAR=1`.
+
+- Foto real do painel backlight: existe um recorte sem logo, mas a arte impressa é de campanha de cliente. Só usar com autorização.
+- Ilustrações IA com defeitos a corrigir numa nova geração em alta resolução (lista em `docs/auditoria-v9.md`, fim do arquivo); a maior é o piso que parece descolar em `ai-floor`.
