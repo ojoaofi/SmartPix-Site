@@ -27,6 +27,8 @@
   function Tracker() { this.s = []; }
   Tracker.prototype.add = function (x, t) { this.s.push([x, t]); if (this.s.length > 6) this.s.shift(); };
   Tracker.prototype.v = function () { var s = this.s; if (s.length < 2) return 0; var a = s[0], b = s[s.length - 1], dt = (b[1] - a[1]) / 1000; return dt > 0 ? (b[0] - a[0]) / dt : 0; };
+  /* run fn right after the next layout (a ResizeObserver's first report), so reading geometry at start forces no reflow */
+  function afterLayout(fn) { if (!W.ResizeObserver) return requestAnimationFrame(fn); var ro = new ResizeObserver(function () { ro.disconnect(); fn(); }); ro.observe(D.documentElement); }
 
   /* ---------- Analytics (GA4 / Tag Manager ready) ---------- */
   W.dataLayer = W.dataLayer || [];
@@ -60,19 +62,36 @@
     }
     var b = getComputedStyle(D.body).backgroundColor.match(/[\d.]+/g); return b ? (0.2126 * b[0] + 0.7152 * b[1] + 0.0722 * b[2]) / 255 : 1;
   }
-  var lastLight = null, edgeRaf = 0, bands = [].slice.call(D.querySelectorAll('main > *, main section, .tiles, .tile, .foot'));
+  /* Band edges are measured in page coordinates only after layout (first layout, load, resize, body height change);
+     scrolling then just compares numbers. Sticky and fixed bands (and a dialog, fixed once open) move with the scroll, so they are read live. */
+  var bands = [].slice.call(D.querySelectorAll('main > *, main section, .tiles, .tile, .foot')), marks = null, navB = 0, lastEl, lastLight = null, lastEdge = null, edgeRaf = 0;
+  function measure() {
+    if (!nav) return;
+    var sy = scrollY; navB = nav.getBoundingClientRect().bottom;
+    marks = bands.map(function (b) {
+      var live = b.tagName === 'DIALOG' || /sticky|fixed/.test(getComputedStyle(b).position), r = live ? null : b.getBoundingClientRect();
+      return { el: b, live: live, top: r ? r.top + sy : 0, bottom: r ? r.bottom + sy : 0 };
+    });
+    lastEl = undefined; edge();
+  }
+  function box(m, sy) { if (!m.live) return [m.top - sy, m.bottom - sy]; var r = m.el.getBoundingClientRect(); return [r.top, r.bottom]; }
   function edge() {
-    edgeRaf = 0; if (!nav) return;
-    nav.style.setProperty('--edge', scrollY > 8 ? 1 : 0);
-    /* the block currently under the bar: the deepest band whose box spans the bar's lower edge */
-    var y = nav.getBoundingClientRect().bottom - 4, el = null;
-    for (var i = 0; i < bands.length; i++) { var r = bands[i].getBoundingClientRect(); if (r.top <= y && r.bottom > y) el = bands[i]; }
-    if (!el) { for (var j = 0; j < bands.length; j++) if (bands[j].getBoundingClientRect().top > y) { el = bands[j]; break; } }
+    edgeRaf = 0; if (!marks) return;
+    var sy = scrollY, e = sy > 8 ? 1 : 0, y = navB - 4, bx = marks.map(function (m) { return box(m, sy); }), el = null, i;
+    /* the block currently under the bar: the deepest band whose box spans the bar's lower edge, else the next one below */
+    for (i = 0; i < bx.length; i++) if (bx[i][0] <= y && bx[i][1] > y) el = marks[i].el;
+    if (!el) for (i = 0; i < bx.length; i++) if (bx[i][0] > y) { el = marks[i].el; break; }
+    if (e !== lastEdge) { lastEdge = e; nav.style.setProperty('--edge', e); }
+    if (el === lastEl) return; lastEl = el;
     var light = el ? bgLum(el) > 0.6 : false;
     if (light !== lastLight) { lastLight = light; nav.classList.toggle('light', light); }
   }
   addEventListener('scroll', function () { if (!edgeRaf) edgeRaf = requestAnimationFrame(edge); }, { passive: true });
-  addEventListener('resize', edge); edge();
+  addEventListener('resize', measure); addEventListener('load', measure);
+  /* the first report arrives right after the first layout, so nothing is measured before the page is laid out */
+  if (W.ResizeObserver) new ResizeObserver(function () { measure(); }).observe(D.body); else requestAnimationFrame(measure);
+  /* backgrounds can change with these preferences */
+  ['(prefers-contrast: more)', '(forced-colors: active)'].forEach(function (q) { try { matchMedia(q).addEventListener('change', measure); } catch (e) {} });
 
   /* ---------- Menu sheet: scales out of its trigger, closes back into it ---------- */
   var btn = D.getElementById('menuBtn'), sheet = D.getElementById('sheet'), scrim = D.getElementById('scrim');
@@ -82,7 +101,7 @@
     function setOpen(v) {
       open = v; btn.setAttribute('aria-expanded', v); scrim.classList.toggle('open', v); D.documentElement.style.overflow = v ? 'hidden' : ''; btn.setAttribute('aria-label', v ? 'Fechar menu' : 'Abrir menu'); if (nav) nav.classList.toggle('menu-open', v);
       if (v) { sheet.classList.add('vis'); sheet.removeAttribute('inert'); }
-      [D.querySelector('main'), D.querySelector('.foot'), D.getElementById('dock'), D.querySelector('.nav-links'), D.querySelector('.brand'), D.querySelector('.nav-wa'), D.querySelector('.nav-cta')].forEach(function (el) { if (el) el.inert = v; });
+      [D.querySelector('main'), D.querySelector('.foot'), D.querySelector('.nav-links'), D.querySelector('.brand'), D.querySelector('.nav-wa'), D.querySelector('.nav-cta')].forEach(function (el) { if (el) el.inert = v; });
       sp.to = v ? 1 : 0;
       if (reduce) { sp.x = sp.to; paint(sp.x); if (!v) { sheet.classList.remove('vis'); sheet.setAttribute('inert', ''); } }
       else { if (anim) anim.stop(); anim = run(sp, paint, function () { if (!open) { sheet.classList.remove('vis'); sheet.setAttribute('inert', ''); } }); }
@@ -90,6 +109,8 @@
       track('menu', { open: v });
     }
     sheet.setAttribute('inert', '');
+    /* the window grew past the phone layout (rotation, resize): the trigger is gone, so the open sheet would trap the page */
+    addEventListener('resize', function () { if (open && !btn.getClientRects().length) setOpen(false); });
     btn.addEventListener('click', function () { setOpen(!open); });
     scrim.addEventListener('click', function () { setOpen(false); });
     sheet.addEventListener('click', function (e) { if (e.target.closest('a') || e.target.closest('[data-close]')) setOpen(false); });
@@ -106,8 +127,16 @@
   /* ---------- Entry motion ---------- */
   if ('IntersectionObserver' in W) {
     if (!reduce) {
-      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.remove('below'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
-      D.querySelectorAll('.rise').forEach(function (el) { if (el.getBoundingClientRect().top > innerHeight) { el.classList.add('below'); io.observe(el); } });
+      /* the first report (after layout, no forced reflow) says where each block starts: only blocks below the fold wait; they enter as soon as they show */
+      var io = new IntersectionObserver(function (es) {
+        var vh = innerHeight;
+        es.forEach(function (e) {
+          var el = e.target;
+          if (!el._rise) { el._rise = 1; if (e.boundingClientRect.top > vh) el.classList.add('below'); else io.unobserve(el); }
+          else if (e.isIntersecting) { el.classList.remove('below'); io.unobserve(el); }
+        });
+      }, { rootMargin: '0px 0px -2% 0px' });
+      D.querySelectorAll('.rise').forEach(function (el) { io.observe(el); });
     }
     var seen = {};
     D.querySelectorAll('section[id]').forEach(function (s) {
@@ -116,16 +145,6 @@
     /* steps fill their rule as they arrive */
     var stepIO = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('on'); stepIO.unobserve(e.target); } }); }, { threshold: 0.6 });
     D.querySelectorAll('.steps li').forEach(function (li, i) { li.style.transitionDelay = (i * 0.12) + 's'; stepIO.observe(li); });
-  }
-
-  /* ---------- Manifesto: words light up with reading progress ---------- */
-  var mf = D.querySelector('.manifesto .big');
-  if (mf) {
-    var words = mf.textContent.trim().split(/\s+/), hl = (mf.getAttribute('data-hl') || '').split('|');
-    mf.innerHTML = words.map(function (w) { return '<span class="w' + (hl.indexOf(w.replace(/[.,:]/g, '')) > -1 ? ' hl' : '') + '">' + w + '</span>'; }).join(' ');
-    var ws = mf.querySelectorAll('.w');
-    function mfScroll() { var b = mf.getBoundingClientRect(), p = (innerHeight * 0.95 - b.top) / (b.height + innerHeight * 0.2); var n = Math.round(Math.max(0, Math.min(1, p)) * ws.length); for (var i = 0; i < ws.length; i++) ws[i].classList.toggle('on', i < n); }
-    if (!reduce) { addEventListener('scroll', function () { requestAnimationFrame(mfScroll); }, { passive: true }); mfScroll(); }
   }
 
   /* ---------- Rails: touch uses native scrolling; mouse gets 1:1 drag, momentum projected to the nearest card, spring settle ---------- */
@@ -175,14 +194,14 @@
     /* arrows dim at the ends, like Apple's galleries */
     var prev = wrap.querySelector('[data-dir="-1"]'), next = wrap.querySelector('[data-dir="1"]');
     function ends() { var max = rail.scrollWidth - rail.clientWidth; if (prev) prev.disabled = rail.scrollLeft <= 2; if (next) next.disabled = rail.scrollLeft >= max - 2; }
-    rail.addEventListener('scroll', function () { requestAnimationFrame(ends); }, { passive: true }); addEventListener('resize', ends); ends();
+    rail.addEventListener('scroll', function () { requestAnimationFrame(ends); }, { passive: true }); addEventListener('resize', ends); afterLayout(ends);
   });
 
   /* ---------- Horizontal sub-navigation: fade only the edge that has more content ---------- */
   D.querySelectorAll('.subnav ul').forEach(function (u) {
     var w = u;
     function f() { w.classList.toggle('fade-l', u.scrollLeft > 4); w.classList.toggle('fade-r', u.scrollLeft < u.scrollWidth - u.clientWidth - 4); }
-    u.addEventListener('scroll', f, { passive: true }); addEventListener('resize', f); f();
+    u.addEventListener('scroll', f, { passive: true }); addEventListener('resize', f); afterLayout(f);
   });
 
   /* ---------- FAQ, copy ---------- */
@@ -198,12 +217,4 @@
 
   /* ---------- Generic WhatsApp links with context ---------- */
   D.querySelectorAll('[data-wa]').forEach(function (a) { a.href = waLink(a.getAttribute('data-wa')); a.target = '_blank'; a.rel = 'noopener'; });
-
-  /* ---------- Mobile dock hides over the quote form and footer ---------- */
-  var dock = D.getElementById('dock');
-  if (dock && 'IntersectionObserver' in W) {
-    var hideFor = D.querySelectorAll('[data-hide-dock], .foot, #resumo'), vis = new Set();
-    var dio = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) vis.add(e.target); else vis.delete(e.target); }); dock.classList.toggle('hide', vis.size > 0); dock.inert = vis.size > 0; }, { threshold: 0.05 });
-    hideFor.forEach(function (el) { dio.observe(el); });
-  }
 })();

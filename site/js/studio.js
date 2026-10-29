@@ -5,18 +5,25 @@
   'use strict';
   var D = document, SP = window.SP, root = D.getElementById('studio');
   if (!root || !SP) return;
+  /* three.js is served next to this file (js/vendor), whatever the page's address */
+  var VENDOR = ((D.currentScript || {}).src || 'js/').replace(/[^\/]*$/, '') + 'vendor/three.min.js';
   var input = D.getElementById('brandName'), quote = D.getElementById('studioQuote'), out = D.getElementById('studioOut');
   var swatches = [].slice.call(root.querySelectorAll('.swatch')), views = [].slice.call(root.querySelectorAll('[data-view]'));
-  var state = { name: '', color: '#bde000' }, live = D.getElementById('studioLive'), liveT = 0, firstSync = true;
-  try { var saved = JSON.parse(sessionStorage.getItem('sp_studio') || 'null'); if (saved) state = saved; } catch (e) {}
+  var state = { name: '', color: '#bde000' }, live = D.getElementById('studioLive'), liveT = 0, firstSync = true, typed = false, schedule = function () {};
+  try { /* a draft from this tab; a colour no longer offered would leave the radio group without a tab stop */
+    var saved = JSON.parse(sessionStorage.getItem('sp_studio') || 'null');
+    if (saved && typeof saved.name === 'string' && swatches.some(function (s) { return s.getAttribute('data-c') === saved.color; })) state = saved;
+  } catch (e) {}
   if (state.name) input.value = state.name;
 
   function brand() { return (state.name || '').trim() || 'SUA MARCA'; }
+  function flatMode() { return root.classList.contains('flat'); }
   function syncUI() {
     swatches.forEach(function (s) { var on = s.getAttribute('data-c') === state.color; s.setAttribute('aria-checked', on); s.tabIndex = on ? 0 : -1; });
     var b = brand(), cname = (swatches.filter(function (s) { return s.getAttribute('data-c') === state.color; })[0] || {}).title || '';
-    out.innerHTML = 'Estande <b>' + esc(b) + '</b>: lona 5 × 3 m sem emenda, Smart Floor, balcão, totem e letra-caixa.';
-    if (firstSync) { firstSync = false; } else { clearTimeout(liveT); liveT = setTimeout(function () { var t = 'Estande atualizado: ' + b + ', cor ' + cname.toLowerCase() + '.'; if (live && live.textContent !== t) live.textContent = t; }, 800); }
+    /* the 2D fallback draws the lona only, so it describes the lona only */
+    out.innerHTML = flatMode() ? 'Lona <b>' + esc(b) + '</b>: 5 × 3 m sem emenda.' : 'Estande <b>' + esc(b) + '</b>: lona 5 × 3 m sem emenda, Smart Floor, balcão, totem e letra-caixa.';
+    if (firstSync) { firstSync = false; } else { clearTimeout(liveT); liveT = setTimeout(function () { var t = (flatMode() ? 'Lona atualizada: ' : 'Estande atualizado: ') + b + ', cor ' + cname.toLowerCase() + '.'; if (live && live.textContent !== t) live.textContent = t; }, 800); }
     var p = new URLSearchParams({ origem: 'estudio-3d', produto: 'Estande completo', marca: b, cor: cname });
     quote.href = 'orcamento.html?' + p.toString();
     quote.textContent = state.name && state.name.trim() ? 'Orçar o estande ' + b : 'Orçar este estande';
@@ -59,10 +66,11 @@
     else if (kind === 'letters') { W = 2048; H = 256; cv.width = W; cv.height = H; g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; fit(g, name.toUpperCase(), W * 0.96, 210, 700); g.fillText(name.toUpperCase(), W / 2, H * 0.54); }
     return cv;
   }
+  /* canvas text does not load web fonts by itself: load both weights the artwork uses, then repaint */
+  function fonts(cb) { if (D.fonts && D.fonts.load && window.Promise) Promise.all([D.fonts.load('700 100px Poppins'), D.fonts.load('400 100px Poppins')]).then(cb, function () {}); }
 
   syncUI();
   input.addEventListener('input', function () { state.name = input.value.slice(0, 22); syncUI(); schedule(); if (!typed) { typed = true; SP.track('studio_brand_typed'); } });
-  var typed = false;
   function pick(s) { state.color = s.getAttribute('data-c'); syncUI(); schedule(); SP.track('studio_color', { color: s.title }); }
   swatches.forEach(function (s, i) {
     s.addEventListener('click', function () { pick(s); });
@@ -73,34 +81,46 @@
   });
   quote.addEventListener('click', function () { SP.track('studio_quote', { brand_typed: !!state.name }); });
 
-  /* ---------- WebGL ---------- */
-  var hasGL = (function () { try { var c = D.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); } catch (e) { return false; } })();
-  var schedule = function () {};
-  /* Without WebGL (or with data saver on) the panel still answers: the 5 × 3 m lona is drawn flat with the visitor's brand. */
+  /* Without WebGL (data saver on, three.js missing, or a failed start) the panel still answers: the 5 × 3 m lona is drawn flat with the visitor's brand. */
   function flat() {
     if (root.classList.contains('gl') || root.classList.contains('flat')) return;
-    var holder = root.querySelector('.studio-3d'), cv = D.createElement('canvas'); cv.className = 'flat-lona'; cv.setAttribute('aria-hidden', 'true');
-    holder.appendChild(cv); root.classList.add('flat');
+    var holder = root.querySelector('.studio-3d'), stage = root.querySelector('.studio-stage'), lead = D.querySelector('#estudio .lead'), cv = D.createElement('canvas');
+    cv.className = 'flat-lona'; cv.setAttribute('aria-hidden', 'true'); holder.appendChild(cv); root.classList.add('flat');
+    /* nothing turns here, and only the lona is shown: say so */
+    if (lead) lead.textContent = 'Digite o nome e escolha a cor. Depois, é só orçar.';
+    holder.setAttribute('aria-label', 'Lona de 5 por 3 metros com a sua marca.'); stage.setAttribute('aria-label', 'Prévia da lona');
+    firstSync = true; syncUI();
     function draw() { var a = art('lona', brand(), state.color); cv.width = a.width / 2; cv.height = a.height / 2; cv.getContext('2d').drawImage(a, 0, 0, cv.width, cv.height); }
-    schedule = function () { requestAnimationFrame(draw); }; draw();
+    schedule = function () { requestAnimationFrame(draw); }; draw(); fonts(schedule);
   }
-  if (!hasGL || (navigator.connection && navigator.connection.saveData)) { flat(); return; }
+
+  /* ---------- WebGL, only once the studio is near ---------- */
+  /* the probe uses a throwaway context and gives it back at once */
+  function webgl() {
+    try {
+      var c = D.createElement('canvas'), g = window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'));
+      if (g) { var x = g.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); }
+      return !!g;
+    } catch (e) { return false; }
+  }
   function load() {
-    var s = D.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.crossOrigin = 'anonymous';
+    var s = D.createElement('script'); s.src = VENDOR;
     s.onload = function () { try { init(); } catch (e) { console.warn('studio', e); flat(); } };
     s.onerror = flat;
     D.head.appendChild(s);
   }
-  /* three.js (~150 KB) loads only when the studio is about to scroll into view */
+  /* the probe and three.js (~150 KB gzip) wait until the studio is about to scroll into view */
   var started = false;
-  function soon() { if (started) return; started = true; load(); }
+  function soon() {
+    if (started) return; started = true;
+    if ((navigator.connection && navigator.connection.saveData) || !webgl()) flat(); else load();
+  }
   if ('IntersectionObserver' in window) { var lio = new IntersectionObserver(function (es) { if (es.some(function (x) { return x.isIntersecting; })) { lio.disconnect(); soon(); } }, { rootMargin: '900px 0px' }); lio.observe(root); }
   else addEventListener('load', soon);
   input.addEventListener('focus', soon);
 
   function init() {
     var T = THREE, stage = root.querySelector('.studio-stage'), cv = D.getElementById('studioCanvas');
-    stage.tabIndex = 0; stage.setAttribute('aria-label', 'Visualizador 3D do estande. Use as setas para girar ou os botões de vista.');
     function C(h) { return new T.Color(h).convertSRGBToLinear(); }
     var R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance' });
     R.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.NoToneMapping; R.setClearColor(0, 0);
@@ -159,17 +179,41 @@
       glow.color = C(c); render();
     }
     var tmr = 0; schedule = function () { clearTimeout(tmr); tmr = setTimeout(repaint, 90); };
-    if (D.fonts && D.fonts.load) D.fonts.load('700 100px Poppins').then(repaint, function () {});
+    fonts(repaint);
 
     /* ---------- camera: yaw on a spring ---------- */
     var STOPS = [-50, -25, 0, 25, 50], LIMIT = 62;
     var yaw = new SP.Spring({ from: SP.reduce ? 25 : 44, to: 25, damping: 1, response: 0.9 }), anim = null;
-    var dist = 10;
-    function size() { var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; R.setSize(w, h, false); cam.aspect = w / h; dist = Math.max(11, 13 / cam.aspect); cam.updateProjectionMatrix(); render(); }
-    var labels = [].slice.call(root.querySelectorAll('.studio-labels span')), anchors = { lona: [-1.3, 2.6, -1.4], piso: [0.6, 0.06, 1.2], balcao: [1.15, 1.25, 0.55], totem: [-1.35, 2.15, 0.95], letra: [2.2, 3.6, -1.2] }, v3 = new T.Vector3();
+    /* Framing: the camera orbits the stand at a fixed elevation; its distance makes the whole stand (letra-caixa included, every view)
+       fit between the view switcher on top of the stage and the panel over its foot, never closer than the approved desktop shot.
+       A lens shift (view offset) centres it there without tilting the camera, so verticals stay straight. */
+    var LOOK = new T.Vector3(0.15, 1.3, -0.3), RISE = 1.8 / 11, MIN_DIST = 11, dist = MIN_DIST, v3 = new T.Vector3();
+    var HULL = [[-2.8, 0, -1.5], [2.8, 0, -1.5], [-2.8, 0, 1.5], [2.8, 0, 1.5], [-2.25, 3.6, -1.5], [2.85, 3.6, -1.5], [-2.25, 3.6, -1.06], [2.85, 3.6, -1.06], [-2.28, 3.04, -1.46], [-2.28, 3.04, 0.94]];
+    var bar = root.querySelector('.studio-views'), panel = root.querySelector('.studio-panel');
+    function place(deg) { var a = deg * Math.PI / 180; cam.position.set(Math.sin(a) * dist + 0.2, LOOK.y + dist * RISE, Math.cos(a) * dist); cam.lookAt(LOOK); }
+    function bounds(w, h) { /* pixel box of the stand over every view the visitor can reach */
+      var b = [Infinity, Infinity, -Infinity, -Infinity];
+      [-LIMIT].concat(STOPS, LIMIT).forEach(function (d) {
+        place(d); cam.updateMatrixWorld();
+        HULL.forEach(function (p) { v3.set(p[0], p[1], p[2]).project(cam); var x = (v3.x + 1) / 2 * w, y = (1 - v3.y) / 2 * h; b[0] = Math.min(b[0], x); b[1] = Math.min(b[1], y); b[2] = Math.max(b[2], x); b[3] = Math.max(b[3], y); });
+      });
+      return b;
+    }
+    function size() {
+      var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+      R.setSize(w, h, false); cam.aspect = w / h; cam.clearViewOffset();
+      /* room left by the view switcher (when it sits on the stage) and by the panel overlapping its foot */
+      var s = stage.getBoundingClientRect(), v = bar ? bar.getBoundingClientRect() : null, p = panel ? panel.getBoundingClientRect() : null;
+      var t = (v && v.height && v.top < s.top + h / 2 ? v.bottom - s.top : 0) + 12, f = (p && p.top > s.top + h / 2 && p.top < s.bottom ? s.bottom - p.top : 0) + 12;
+      var aw = w - 32, ah = Math.max(h * 0.4, h - t - f), b, k;
+      for (var i = 0; i < 5; i++) { b = bounds(w, h); k = Math.min(aw / (b[2] - b[0]), ah / (b[3] - b[1])); dist = Math.max(MIN_DIST, dist / k); }
+      b = bounds(w, h);
+      cam.setViewOffset(w, h, (b[0] + b[2] - w) / 2, (b[1] + b[3]) / 2 - (t + ah / 2), w, h);
+      render();
+    }
+    var labels = [].slice.call(root.querySelectorAll('.studio-labels span')), anchors = { lona: [-1.3, 2.6, -1.4], piso: [0.6, 0.06, 1.2], balcao: [1.15, 1.25, 0.55], totem: [-1.35, 2.15, 0.95], letra: [2.2, 3.6, -1.2] };
     function render() {
-      var a = yaw.x * Math.PI / 180;
-      cam.position.set(Math.sin(a) * dist + 0.2, 3.1, Math.cos(a) * dist); cam.lookAt(0.15, 1.3, -0.3);
+      place(yaw.x);
       R.render(S, cam);
       var w = stage.clientWidth, h = stage.clientHeight;
       labels.forEach(function (l) { var p = anchors[l.getAttribute('data-part')]; v3.set(p[0], p[1], p[2]).project(cam); l.style.transform = 'translate(' + ((v3.x + 1) / 2 * w).toFixed(1) + 'px,' + ((1 - v3.y) / 2 * h).toFixed(1) + 'px) translate(-50%,-50%)'; });
@@ -211,7 +255,9 @@
 
     size(); addEventListener('resize', size);
     if (window.ResizeObserver) new ResizeObserver(size).observe(stage);
+    /* 3D is up: the stage becomes a focusable viewer, and the framing is redone with the view switcher shown */
+    stage.tabIndex = 0; stage.setAttribute('aria-label', 'Visualizador 3D do estande. Use as setas para girar ou os botões de vista.');
     root.classList.add('gl'); if (matchMedia('(min-width: 700px)').matches) root.classList.add('labels');
-    markView(25); go(25);
+    size(); markView(25); go(25);
   }
 })();

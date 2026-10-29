@@ -8,8 +8,7 @@
   var waBtn = D.getElementById('sendWa'), mailBtn = D.getElementById('sendMail'), list = D.getElementById('sumList');
   var stBox = D.getElementById('qSticky'), stBtn = D.getElementById('qStickyBtn'), stTxt = D.getElementById('qStickyTxt');
   if (stBtn) { stBtn.target = '_blank'; stBtn.rel = 'noopener'; }
-  var started = false, KEY = 'sp_quote', sumLive = D.getElementById('sumLive'), liveT = 0, dockBtn = D.getElementById('dockMain');
-  if (dockBtn) { dockBtn.target = '_blank'; dockBtn.rel = 'noopener'; }
+  var started = false, KEY = 'sp_quote', sumLive = D.getElementById('sumLive'), liveT = 0;
 
   function one(n) { var r = form.querySelector('input[name="' + n + '"]:checked'); return r ? r.value : ''; }
   function many(n) { return $$('input[name="' + n + '"]:checked').map(function (i) { return i.value; }); }
@@ -57,7 +56,6 @@
     list.innerHTML = rows(d).map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('');
     var area = D.getElementById('sumArea'); area.textContent = d.sized ? fmt(d.w * d.h * d.q) + ' m²' : 'a definir'; area.classList.toggle('empty', !d.sized);
     clearTimeout(liveT); liveT = setTimeout(function () { var t = 'Resumo: ' + (d.produtos.length ? d.produtos.length + (d.produtos.length === 1 ? ' produto' : ' produtos') : 'nenhum produto') + (d.sized ? ', ' + fmt(d.w * d.h * d.q) + ' m²' : '') + '.'; if (sumLive.textContent !== t) sumLive.textContent = t; }, 900);
-    if (dockBtn) dockBtn.href = SP.waLink(message(d));
     if (stBtn) { stBtn.href = SP.waLink(message(d)); stTxt.textContent = (d.produtos.length ? d.produtos.join(', ') : 'Resumo do pedido') + (d.sized ? ' · ' + fmt(d.w * d.h * d.q) + ' m²' : ''); }
     var seam = D.getElementById('seam'), lona = d.produtos.some(function (p) { return /Lona|Estande/.test(p); });
     seam.hidden = !(lona && d.sized); if (!seam.hidden) { var ok = Math.min(d.w, d.h) <= 5; seam.className = 'badge' + (ok ? '' : ' warn'); seam.textContent = ok ? 'Cabe numa peça só: até 5 m de largura sem emenda.' : 'Acima de 5 m nos dois lados, a lona é feita em partes.'; }
@@ -114,7 +112,6 @@
   function send(method) { return function (e) { if (!check('s')) { e.preventDefault(); return; } update(); var d = data(); if (method === 'whatsapp') { var st = D.getElementById('sent'); st.hidden = false; } SP.track('generate_lead', { method: method, perfil: d.perfil, produtos: d.produtos.join('|'), area_m2: d.sized ? +(d.w * d.h * d.q).toFixed(2) : 0, days_to_event: d.days, installation: d.inst || 'n/a', lead_source: d.origem || 'n/a' }); }; }
   waBtn.addEventListener('click', send('whatsapp'));
   mailBtn.addEventListener('click', send('email'));
-  if (dockBtn) dockBtn.addEventListener('click', send('whatsapp'));
   if (stBtn) stBtn.addEventListener('click', send('whatsapp'));
   /* the phone send bar shows once the visitor starts and hides while the summary itself is on screen */
   if (stBox && 'IntersectionObserver' in window) {
@@ -124,7 +121,8 @@
     form.addEventListener('input', stUpdate); form.addEventListener('change', stUpdate);
   }
   var cm = D.getElementById('copyMsg');
-  if (cm) cm.addEventListener('click', function () { var t = message(data()); try { navigator.clipboard.writeText(t).then(function () { cm.textContent = 'Mensagem copiada'; SP.say('Mensagem copiada'); setTimeout(function () { cm.textContent = 'Copiar mensagem'; }, 1800); }); } catch (e) {} SP.track('copy', { what: 'quote_message' }); });
-  var dateEl = form.elements.data; if (dateEl) { var t = new Date(); dateEl.min = t.toISOString().slice(0, 10); }
+  if (cm) cm.addEventListener('click', function () { var t = message(data()); try { navigator.clipboard.writeText(t).then(function () { cm.textContent = 'Mensagem copiada'; SP.say('Mensagem copiada'); setTimeout(function () { cm.textContent = 'Copiar mensagem'; }, 1800); }, function () {}); } catch (e) {} SP.track('copy', { what: 'quote_message' }); });
+  /* earliest date is today in the visitor's time zone (toISOString is UTC: after 21h in Brazil it would already be tomorrow) */
+  var dateEl = form.elements.data; if (dateEl) { var t = new Date(), two = function (n) { return (n < 10 ? '0' : '') + n; }; dateEl.min = t.getFullYear() + '-' + two(t.getMonth() + 1) + '-' + two(t.getDate()); }
   update();
 })();
